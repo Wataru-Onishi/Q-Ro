@@ -126,7 +126,8 @@ try:
                 else:
                     print(f"Button {event.button} is out of range and has no defined action.")
             elif event.type == JOYHATMOTION:
-                # Similar handling for D-pad movement
+                # Hat switch events
+                pass  # Add your D-pad handling logic here
             elif event.type == pygame.QUIT:
                 running = False
 finally:
