@@ -83,6 +83,10 @@ def set_goal_velocity(id, velocity):
 def set_goal_position(id, position):
     packetHandler.write4ByteTxRx(portHandler, id, ADDR_GOAL_POSITION, position)
 
+def get_present_position(id):
+    present_position, _, _ = packetHandler.read4ByteTxRx(portHandler, id, ADDR_PRESENT_POSITION)
+    return present_position
+
 # Enable torque for all motors
 enable_torque([DXL_ID_1, DXL_ID_2, DXL_ID_3], TORQUE_ENABLE)
 
@@ -133,6 +137,14 @@ try:
                     print("Turning left with Motors 2 and 3.")
             elif event.type == pygame.QUIT:
                 running = False
+
+        # Check if ID 1 has reached the goal position
+        if set_operating_mode == CURRENT_CONTROL_MODE:
+            current_position = get_present_position(DXL_ID_1)
+            if abs(current_position - goal_position_1) < 10:  # Tolerance of 10 units
+                set_goal_current(DXL_ID_1, 0)  # Stop the motor
+                print(f"ID 1: Reached position {goal_position_1} and stopped.")
+
 finally:
     enable_torque([DXL_ID_1, DXL_ID_2, DXL_ID_3], TORQUE_DISABLE)  # Disable torque on exit
     portHandler.closePort()
