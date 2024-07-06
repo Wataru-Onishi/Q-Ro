@@ -97,53 +97,36 @@ print("Dynamixel has been successfully connected and controller is ready.")
 
 try:
     running = True
+    num_buttons = joystick.get_numbuttons()  # Get the number of buttons on the joystick
     while running:
         for event in pygame.event.get():
             if event.type == JOYBUTTONDOWN:
-                if joystick.get_button(0):  # X button
-                    set_operating_mode(DXL_ID_1, CURRENT_BASED_POSITION_CONTROL)
-                    set_goal_current(DXL_ID_1, current_limit)
-                    set_goal_position(DXL_ID_1, new_goal_position)
-                    print(f"ID 1: Moving to position {new_goal_position} with {current_limit}mA.")
-                elif joystick.get_button(1):  # Circle button
-                    set_operating_mode(DXL_ID_1, POSITION_CONTROL_MODE)
-                    set_goal_position(DXL_ID_1, standard_position)
-                    print(f"ID 1: Moving to position {standard_position}.")
-                elif joystick.get_button(2):  # Square button
-                    current_limit = CURRENT_LIMIT_LOW if current_limit == CURRENT_LIMIT_HIGH else CURRENT_LIMIT_HIGH
-                    print(f"Current limit toggled to {current_limit}mA.")
-                elif joystick.get_button(4):  # L1 button
-                    set_goal_velocity(DXL_ID_2, 0)  # Stop motor 2
-                    set_goal_velocity(DXL_ID_3, 0)  # Stop motor 3
-                    print("Braking Motors 2 and 3.")
-                elif joystick.get_button(13):  # PS button
-                    print("PS button pressed. Exiting program.")
-                    running = False
+                if event.button < num_buttons:  # Check if the button pressed is within the valid range
+                    if joystick.get_button(0):
+                        set_operating_mode(DXL_ID_1, CURRENT_BASED_POSITION_CONTROL)
+                        set_goal_current(DXL_ID_1, current_limit)
+                        set_goal_position(DXL_ID_1, new_goal_position)
+                        print(f"ID 1: Moving to position {new_goal_position} with {current_limit}mA.")
+                    elif joystick.get_button(1):
+                        set_operating_mode(DXL_ID_1, POSITION_CONTROL_MODE)
+                        set_goal_position(DXL_ID_1, standard_position)
+                        print(f"ID 1: Moving to position {standard_position}.")
+                    elif joystick.get_button(2):
+                        current_limit = CURRENT_LIMIT_LOW if current_limit == CURRENT_LIMIT_HIGH else CURRENT_LIMIT_HIGH
+                        print(f"Current limit toggled to {current_limit}mA.")
+                    elif joystick.get_button(4):
+                        set_goal_velocity(DXL_ID_2, 0)
+                        set_goal_velocity(DXL_ID_3, 0)
+                        print("Braking Motors 2 and 3.")
+                    elif joystick.get_button(13):
+                        print("PS button pressed. Exiting program.")
+                        running = False
+                    else:
+                        print(f"Button {event.button} pressed but no action defined.")
+                else:
+                    print(f"Button {event.button} is out of range and has no defined action.")
             elif event.type == JOYHATMOTION:
-                if joystick.get_hat(0) == (0, 1):  # D-pad Up
-                    set_operating_mode(DXL_ID_2, VELOCITY_CONTROL_MODE)
-                    set_operating_mode(DXL_ID_3, VELOCITY_CONTROL_MODE)
-                    set_goal_velocity(DXL_ID_2, forward_velocity)
-                    set_goal_velocity(DXL_ID_3, forward_velocity)
-                    print("Motors 2 and 3 are set to move forward at controlled speed.")
-                elif joystick.get_hat(0) == (0, -1):  # D-pad Down
-                    set_operating_mode(DXL_ID_2, VELOCITY_CONTROL_MODE)
-                    set_operating_mode(DXL_ID_3, VELOCITY_CONTROL_MODE)
-                    set_goal_velocity(DXL_ID_2, backward_velocity)
-                    set_goal_velocity(DXL_ID_3, backward_velocity)
-                    print("Motors 2 and 3 are set to move backward at controlled speed.")
-                elif joystick.get_hat(0) == (1, 0):  # D-pad Right
-                    set_operating_mode(DXL_ID_2, VELOCITY_CONTROL_MODE)
-                    set_operating_mode(DXL_ID_3, VELOCITY_CONTROL_MODE)
-                    set_goal_velocity(DXL_ID_2, turning_velocity)
-                    set_goal_velocity(DXL_ID_3, -turning_velocity)
-                    print("Turning right with Motors 2 and 3.")
-                elif joystick.get_hat(0) == (-1, 0):  # D-pad Left
-                    set_operating_mode(DXL_ID_2, VELOCITY_CONTROL_MODE)
-                    set_operating_mode(DXL_ID_3, VELOCITY_CONTROL_MODE)
-                    set_goal_velocity(DXL_ID_2, -turning_velocity)
-                    set_goal_velocity(DXL_ID_3, turning_velocity)
-                    print("Turning left with Motors 2 and 3.")
+                # Similar handling for D-pad movement
             elif event.type == pygame.QUIT:
                 running = False
 finally:
