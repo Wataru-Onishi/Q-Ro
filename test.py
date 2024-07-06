@@ -43,7 +43,7 @@ POSITION_CONTROL_MODE = 3
 VELOCITY_CONTROL_MODE = 1
 
 # New Goal settings for ID 1 when X button is pressed
-new_goal_current_mA = 3  # Current in mA
+new_goal_current_mA = 12  # Current in mA
 new_goal_position = 900  # Position to move to
 
 # Standard positions and velocities
