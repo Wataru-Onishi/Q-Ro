@@ -16,10 +16,12 @@ ADDR_GOAL_CURRENT = 102
 ADDR_GOAL_VELOCITY = 104  # For velocity control
 ADDR_GOAL_POSITION = 116
 ADDR_PRESENT_POSITION = 132
+ADDR_PROPORTIONAL_GAIN = 80  # Adjust these addresses based on your model
+ADDR_INTEGRAL_GAIN = 82
+ADDR_DERIVATIVE_GAIN = 84
 
 # Data Byte Length
 LEN_GOAL_CURRENT = 2
-LEN_GOAL_VELOCITY = 4
 LEN_GOAL_POSITION = 4
 
 # Protocol version
@@ -37,12 +39,11 @@ TORQUE_DISABLE = 0
 
 # Operating Modes
 CURRENT_BASED_POSITION_CONTROL = 5
-CURRENT_CONTROL_MODE = 0
 POSITION_CONTROL_MODE = 3
-VELOCITY_CONTROL_MODE = 1  # For velocity control
+VELOCITY_CONTROL_MODE = 1
 
 # New Goal settings for ID 1 when X button is pressed
-new_goal_current_mA = 3  # Current in mA
+new_goal_current_mA = 200  # Current in mA
 new_goal_position = 900  # Position to move to
 
 # Standard positions and velocities
