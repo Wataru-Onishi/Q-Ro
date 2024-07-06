@@ -125,8 +125,30 @@ try:
                 else:
                     print(f"Button {event.button} is out of range and has no defined action.")
             elif event.type == JOYHATMOTION:
-                # Implement joystick hat switch behavior here if needed
-                pass
+                if joystick.get_hat(0) == (0, 1):  # D-pad Up
+                    set_operating_mode(DXL_ID_2, VELOCITY_CONTROL_MODE)
+                    set_operating_mode(DXL_ID_3, VELOCITY_CONTROL_MODE)
+                    set_goal_velocity(DXL_ID_2, forward_velocity)
+                    set_goal_velocity(DXL_ID_3, forward_velocity)
+                    print("Motors 2 and 3 are set to move forward at controlled speed.")
+                elif joystick.get_hat(0) == (0, -1):  # D-pad Down
+                    set_operating_mode(DXL_ID_2, VELOCITY_CONTROL_MODE)
+                    set_operating_mode(DXL_ID_3, VELOCITY_CONTROL_MODE)
+                    set_goal_velocity(DXL_ID_2, backward_velocity)
+                    set_goal_velocity(DXL_ID_3, backward_velocity)
+                    print("Motors 2 and 3 are set to move backward at controlled speed.")
+                elif joystick.get_hat(0) == (1, 0):  # D-pad Right
+                    set_operating_mode(DXL_ID_2, VELOCITY_CONTROL_MODE)
+                    set_operating_mode(DXL_ID_3, VELOCITY_CONTROL_MODE)
+                    set_goal_velocity(DXL_ID_2, turning_velocity)
+                    set_goal_velocity(DXL_ID_3, -turning_velocity)
+                    print("Turning right with Motors 2 and 3.")
+                elif joystick.get_hat(0) == (-1, 0):  # D-pad Left
+                    set_operating_mode(DXL_ID_2, VELOCITY_CONTROL_MODE)
+                    set_operating_mode(DXL_ID_3, VELOCITY_CONTROL_MODE)
+                    set_goal_velocity(DXL_ID_2, -turning_velocity)
+                    set_goal_velocity(DXL_ID_3, turning_velocity)
+                    print("Turning left with Motors 2 and 3.")
             elif event.type == pygame.QUIT:
                 running = False
 finally:
