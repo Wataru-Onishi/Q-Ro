@@ -117,7 +117,7 @@ try:
                         set_goal_velocity(DXL_ID_2, 0)
                         set_goal_velocity(DXL_ID_3, 0)
                         print("Braking Motors 2 and 3.")
-                    elif button == 13:
+                    elif button == 10:  # PS button
                         print("PS button pressed. Exiting program.")
                         running = False
                     else:
