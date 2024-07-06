@@ -42,8 +42,12 @@ CURRENT_BASED_POSITION_CONTROL = 5
 POSITION_CONTROL_MODE = 3
 VELOCITY_CONTROL_MODE = 1
 
+# Current limit constants
+CURRENT_LIMIT_HIGH = 20
+CURRENT_LIMIT_LOW = 10
+current_limit = CURRENT_LIMIT_HIGH  # Default current in mA
+
 # New Goal settings for ID 1 when X button is pressed
-current_limit = 20  # Default current in mA
 new_goal_position = 900  # Position to move to
 
 # Standard positions and velocities
@@ -105,8 +109,8 @@ try:
                     set_operating_mode(DXL_ID_1, POSITION_CONTROL_MODE)
                     set_goal_position(DXL_ID_1, standard_position)
                     print(f"ID 1: Moving to position {standard_position}.")
-                elif joystick.get_button(3):  # Square button, toggle current limit
-                    current_limit = 10 if current_limit == 20 else 20
+                elif joystick.get_button(2):  # Square button, toggle current limit
+                    current_limit = CURRENT_LIMIT_LOW if current_limit == CURRENT_LIMIT_HIGH else CURRENT_LIMIT_HIGH
                     print(f"Current limit toggled to {current_limit}mA.")
                 elif joystick.get_button(4):  # L1 button
                     set_goal_velocity(DXL_ID_2, 0)  # Stop motor 2
