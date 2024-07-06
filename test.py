@@ -26,9 +26,9 @@ LEN_GOAL_POSITION = 4
 PROTOCOL_VERSION = 2.0
 
 # Default setting
-DXL_ID_1 = 1  # Dynamixel ID for the original motor
-DXL_ID_2 = 2  # Dynamixel ID for the first new motor
-DXL_ID_3 = 3  # Dynamixel ID for the second new motor
+DXL_ID_7 = 1  # Dynamixel ID for the original motor
+DXL_ID_5 = 2  # Dynamixel ID for the first new motor
+DXL_ID_6 = 3  # Dynamixel ID for the second new motor
 BAUDRATE = 57600
 DEVICENAME = '/dev/DYNAMIXEL'  # The port being used
 
@@ -40,11 +40,11 @@ CURRENT_CONTROL_MODE = 0
 POSITION_CONTROL_MODE = 3
 VELOCITY_CONTROL_MODE = 1  # For velocity control
 
-# Goal settings for ID 1
+# Goal settings for ID 7
 goal_current_mA = 12  # in mA
 goal_position_1 = 1800  # Example position
 
-# Velocity settings for IDs 2 & 3
+# Velocity settings for IDs 5 & 6
 set_velocity = 200
 goal_velocity_forward = set_velocity  # Positive for forward
 goal_velocity_backward = -1 * set_velocity  # Negative for backward
@@ -85,7 +85,7 @@ def set_goal_position(id, position):
     packetHandler.write4ByteTxRx(portHandler, id, ADDR_GOAL_POSITION, position)
 
 # Enable torque for all motors
-enable_torque([DXL_ID_1, DXL_ID_2, DXL_ID_3], TORQUE_ENABLE)
+enable_torque([DXL_ID_7, DXL_ID_5, DXL_ID_6], TORQUE_ENABLE)
 
 print("Dynamixel has been successfully connected and controller is ready.")
 
@@ -95,48 +95,48 @@ try:
         for event in pygame.event.get():
             if event.type == JOYBUTTONDOWN:
                 if joystick.get_button(0):  # X button
-                    set_operating_mode(DXL_ID_1, CURRENT_CONTROL_MODE)
-                    set_goal_current(DXL_ID_1, goal_current_mA)
-                    print(f"ID 1: {goal_current_mA}mA current set.")
+                    set_operating_mode(DXL_ID_7, CURRENT_CONTROL_MODE)
+                    set_goal_current(DXL_ID_7, goal_current_mA)
+                    print(f"ID 7: {goal_current_mA}mA current set.")
                 elif joystick.get_button(1):  # Circle button
-                    set_operating_mode(DXL_ID_1, POSITION_CONTROL_MODE)
-                    set_goal_position(DXL_ID_1, goal_position_1)
-                    print(f"ID 1: Moving to position {goal_position_1}.")
+                    set_operating_mode(DXL_ID_7, POSITION_CONTROL_MODE)
+                    set_goal_position(DXL_ID_7, goal_position_1)
+                    print(f"ID 7: Moving to position {goal_position_1}.")
                 elif joystick.get_button(4):  # L1 button
-                    set_goal_velocity(DXL_ID_2, 0)  # Stop motor 2
-                    set_goal_velocity(DXL_ID_3, 0)  # Stop motor 3
-                    print("Braking Motors 2 and 3.")
+                    set_goal_velocity(DXL_ID_5, 0)  # Stop motor 5
+                    set_goal_velocity(DXL_ID_6, 0)  # Stop motor 6
+                    print("Braking Motors 5 and 6.")
                 elif joystick.get_button(13):  # PS button
                     print("PS button pressed. Exiting program.")
                     running = False
             elif event.type == JOYHATMOTION:
                 if joystick.get_hat(0) == (0, 1):  # D-pad Up
-                    set_operating_mode(DXL_ID_2, VELOCITY_CONTROL_MODE)
-                    set_operating_mode(DXL_ID_3, VELOCITY_CONTROL_MODE)
-                    set_goal_velocity(DXL_ID_2, -goal_velocity_forward)
-                    set_goal_velocity(DXL_ID_3, goal_velocity_forward)
-                    print("Motors 2 and 3 are set to move forward at controlled speed.")
+                    set_operating_mode(DXL_ID_5, VELOCITY_CONTROL_MODE)
+                    set_operating_mode(DXL_ID_6, VELOCITY_CONTROL_MODE)
+                    set_goal_velocity(DXL_ID_5, -goal_velocity_forward)
+                    set_goal_velocity(DXL_ID_6, goal_velocity_forward)
+                    print("Motors 5 and 6 are set to move forward at controlled speed.")
                 elif joystick.get_hat(0) == (0, -1):  # D-pad Down
-                    set_operating_mode(DXL_ID_2, VELOCITY_CONTROL_MODE)
-                    set_operating_mode(DXL_ID_3, VELOCITY_CONTROL_MODE)
-                    set_goal_velocity(DXL_ID_2, -goal_velocity_backward)
-                    set_goal_velocity(DXL_ID_3, goal_velocity_backward)
-                    print("Motors 2 and 3 are set to move backward at controlled speed.")
+                    set_operating_mode(DXL_ID_5, VELOCITY_CONTROL_MODE)
+                    set_operating_mode(DXL_ID_6, VELOCITY_CONTROL_MODE)
+                    set_goal_velocity(DXL_ID_5, -goal_velocity_backward)
+                    set_goal_velocity(DXL_ID_6, goal_velocity_backward)
+                    print("Motors 5 and 6 are set to move backward at controlled speed.")
                 elif joystick.get_hat(0) == (1, 0):  # D-pad Right
-                    set_operating_mode(DXL_ID_2, VELOCITY_CONTROL_MODE)
-                    set_operating_mode(DXL_ID_3, VELOCITY_CONTROL_MODE)
-                    set_goal_velocity(DXL_ID_2, turning_velocity)  # Motor 2 turns backward
-                    set_goal_velocity(DXL_ID_3, turning_velocity)  # Motor 3 turns forward
-                    print("Turning right with Motors 2 and 3.")
+                    set_operating_mode(DXL_ID_5, VELOCITY_CONTROL_MODE)
+                    set_operating_mode(DXL_ID_6, VELOCITY_CONTROL_MODE)
+                    set_goal_velocity(DXL_ID_5, turning_velocity)  # Motor 5 turns backward
+                    set_goal_velocity(DXL_ID_6, turning_velocity)  # Motor 6 turns forward
+                    print("Turning right with Motors 5 and 6.")
                 elif joystick.get_hat(0) == (-1, 0):  # D-pad Left
-                    set_operating_mode(DXL_ID_2, VELOCITY_CONTROL_MODE)
-                    set_operating_mode(DXL_ID_3, VELOCITY_CONTROL_MODE)
-                    set_goal_velocity(DXL_ID_2, -turning_velocity)  # Motor 2 turns forward
-                    set_goal_velocity(DXL_ID_3, -turning_velocity)  # Motor 3 turns backward
-                    print("Turning left with Motors 2 and 3.")
+                    set_operating_mode(DXL_ID_5, VELOCITY_CONTROL_MODE)
+                    set_operating_mode(DXL_ID_6, VELOCITY_CONTROL_MODE)
+                    set_goal_velocity(DXL_ID_5, -turning_velocity)  # Motor 5 turns forward
+                    set_goal_velocity(DXL_ID_6, -turning_velocity)  # Motor 6 turns backward
+                    print("Turning left with Motors 5 and 6.")
             elif event.type == pygame.QUIT:
                 running = False
 finally:
-    enable_torque([DXL_ID_1, DXL_ID_2, DXL_ID_3], TORQUE_DISABLE)  # Disable torque on exit
+    enable_torque([DXL_ID_7, DXL_ID_5, DXL_ID_6], TORQUE_DISABLE)  # Disable torque on exit
     portHandler.closePort()
     pygame.quit()
