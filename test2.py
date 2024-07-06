@@ -16,9 +16,6 @@ ADDR_GOAL_CURRENT = 102
 ADDR_GOAL_VELOCITY = 104  # For velocity control
 ADDR_GOAL_POSITION = 116
 ADDR_PRESENT_POSITION = 132
-ADDR_PROPORTIONAL_GAIN = 80  # Adjust these addresses based on your model
-ADDR_INTEGRAL_GAIN = 82
-ADDR_DERIVATIVE_GAIN = 84
 
 # Data Byte Length
 LEN_GOAL_CURRENT = 2
@@ -97,36 +94,34 @@ print("Dynamixel has been successfully connected and controller is ready.")
 
 try:
     running = True
-    num_buttons = joystick.get_numbuttons()  # Get the number of buttons on the joystick
     while running:
         for event in pygame.event.get():
             if event.type == JOYBUTTONDOWN:
-                if event.button < num_buttons:  # Check if the button pressed is within the valid range
-                    if joystick.get_button(0):
-                        set_operating_mode(DXL_ID_1, CURRENT_BASED_POSITION_CONTROL)
-                        set_goal_current(DXL_ID_1, current_limit)
-                        set_goal_position(DXL_ID_1, new_goal_position)
-                        print(f"ID 1: Moving to position {new_goal_position} with {current_limit}mA.")
-                    elif joystick.get_button(1):
-                        set_operating_mode(DXL_ID_1, POSITION_CONTROL_MODE)
-                        set_goal_position(DXL_ID_1, standard_position)
-                        print(f"ID 1: Moving to position {standard_position}.")
-                    elif joystick.get_button(2):
-                        current_limit = CURRENT_LIMIT_LOW if current_limit == CURRENT_LIMIT_HIGH else CURRENT_LIMIT_HIGH
-                        print(f"Current limit toggled to {current_limit}mA.")
-                    elif joystick.get_button(4):
-                        set_goal_velocity(DXL_ID_2, 0)
-                        set_goal_velocity(DXL_ID_3, 0)
-                        print("Braking Motors 2 and 3.")
-                    elif joystick.get_button(13):
-                        print("PS button pressed. Exiting program.")
-                        running = False
-                    else:
-                        print(f"Button {event.button} pressed but no action defined.")
-                else:
+                if event.button >= joystick.get_numbuttons():
                     print(f"Button {event.button} is out of range and has no defined action.")
+                    continue
+                if joystick.get_button(0):
+                    set_operating_mode(DXL_ID_1, CURRENT_BASED_POSITION_CONTROL)
+                    set_goal_current(DXL_ID_1, current_limit)
+                    set_goal_position(DXL_ID_1, new_goal_position)
+                    print(f"ID 1: Moving to position {new_goal_position} with {current_limit}mA.")
+                elif joystick.get_button(1):
+                    set_operating_mode(DXL_ID_1, POSITION_CONTROL_MODE)
+                    set_goal_position(DXL_ID_1, standard_position)
+                    print(f"ID 1: Moving to position {standard_position}.")
+                elif joystick.get_button(2):
+                    current_limit = CURRENT_LIMIT_LOW if current_limit == CURRENT_LIMIT_HIGH else CURRENT_LIMIT_HIGH
+                    print(f"Current limit toggled to {current_limit}mA.")
+                elif joystick.get_button(4):
+                    set_goal_velocity(DXL_ID_2, 0)
+                    set_goal_velocity(DXL_ID_3, 0)
+                    print("Braking Motors 2 and 3.")
+                elif joystick.get_button(13):
+                    print("PS button pressed. Exiting program.")
+                    running = False
+                else:
+                    print(f"Button {event.button} pressed but no action defined.")
             elif event.type == JOYHATMOTION:
-                # Hat switch events
                 pass  # Add your D-pad handling logic here
             elif event.type == pygame.QUIT:
                 running = False
