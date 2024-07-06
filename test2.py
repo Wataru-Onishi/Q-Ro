@@ -105,7 +105,7 @@ try:
                     set_operating_mode(DXL_ID_1, POSITION_CONTROL_MODE)
                     set_goal_position(DXL_ID_1, standard_position)
                     print(f"ID 1: Moving to position {standard_position}.")
-                elif joystick.get_button(2):  # Square button, toggle current limit
+                elif joystick.get_button(3):  # Square button, toggle current limit
                     current_limit = 10 if current_limit == 20 else 20
                     print(f"Current limit toggled to {current_limit}mA.")
                 elif joystick.get_button(4):  # L1 button
