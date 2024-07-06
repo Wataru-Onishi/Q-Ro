@@ -16,15 +16,12 @@ ADDR_GOAL_CURRENT = 102
 ADDR_GOAL_VELOCITY = 104  # For velocity control
 ADDR_GOAL_POSITION = 116
 ADDR_PRESENT_POSITION = 132
-
-# PID Gain addresses (Assumed addresses, may need to be updated based on your model)
-ADDR_PROPORTIONAL_GAIN = 80
+ADDR_PROPORTIONAL_GAIN = 80  # Adjust these addresses based on your model
 ADDR_INTEGRAL_GAIN = 82
 ADDR_DERIVATIVE_GAIN = 84
 
 # Data Byte Length
 LEN_GOAL_CURRENT = 2
-LEN_GOAL_VELOCITY = 4
 LEN_GOAL_POSITION = 4
 
 # Protocol version
@@ -42,13 +39,8 @@ TORQUE_DISABLE = 0
 
 # Operating Modes
 CURRENT_BASED_POSITION_CONTROL = 5
-VELOCITY_CONTROL_MODE = 1  # For velocity control
 POSITION_CONTROL_MODE = 3
-
-# PID Gain values
-proportional_gain = 800
-integral_gain = 0
-derivative_gain = 0
+VELOCITY_CONTROL_MODE = 1
 
 # New Goal settings for ID 1 when X button is pressed
 new_goal_current_mA = 3  # Current in mA
@@ -76,18 +68,14 @@ if not portHandler.setBaudRate(BAUDRATE):
     print("Failed to change the baudrate!")
     quit()
 
-def enable_torque(id, enable):
-    packetHandler.write1ByteTxRx(portHandler, id, ADDR_TORQUE_ENABLE, enable)
+def enable_torque(ids, enable):
+    for id in ids:
+        packetHandler.write1ByteTxRx(portHandler, id, ADDR_TORQUE_ENABLE, enable)
 
 def set_operating_mode(id, mode):
-    enable_torque(id, TORQUE_DISABLE)  # Disable torque before changing mode
+    enable_torque([id], TORQUE_DISABLE)  # Disable torque before changing mode
     packetHandler.write1ByteTxRx(portHandler, id, ADDR_OPERATING_MODE, mode)
-    enable_torque(id, TORQUE_ENABLE)  # Re-enable torque after changing mode
-
-def set_pid_gains(id, p_gain, i_gain, d_gain):
-    packetHandler.write2ByteTxRx(portHandler, id, ADDR_PROPORTIONAL_GAIN, p_gain)
-    packetHandler.write2ByteTxRx(portHandler, id, ADDR_INTEGRAL_GAIN, i_gain)
-    packetHandler.write2ByteTxRx(portHandler, id, ADDR_DERIVATIVE_GAIN, d_gain)
+    enable_torque([id], TORQUE_ENABLE)  # Re-enable torque after changing mode
 
 def set_goal_current(id, current):
     packetHandler.write2ByteTxRx(portHandler, id, ADDR_GOAL_CURRENT, current)
@@ -98,13 +86,8 @@ def set_goal_position(id, position):
 def set_goal_velocity(id, velocity):
     packetHandler.write4ByteTxRx(portHandler, id, ADDR_GOAL_VELOCITY, velocity)
 
-# Set PID gains
-set_pid_gains(DXL_ID_1, proportional_gain, integral_gain, derivative_gain)
-
 # Enable torque for all motors
-enable_torque(DXL_ID_1, TORQUE_ENABLE)
-enable_torque(DXL_ID_2, TORQUE_ENABLE)
-enable_torque(DXL_ID_3, TORQUE_ENABLE)
+enable_torque([DXL_ID_1, DXL_ID_2, DXL_ID_3], TORQUE_ENABLE)
 
 print("Dynamixel has been successfully connected and controller is ready.")
 
@@ -145,20 +128,18 @@ try:
                 elif joystick.get_hat(0) == (1, 0):  # D-pad Right
                     set_operating_mode(DXL_ID_2, VELOCITY_CONTROL_MODE)
                     set_operating_mode(DXL_ID_3, VELOCITY_CONTROL_MODE)
-                    set_goal_velocity(DXL_ID_2, turning_velocity)  # Motor 2 turns backward
-                    set_goal_velocity(DXL_ID_3, -turning_velocity)  # Motor 3 turns forward
+                    set_goal_velocity(DXL_ID_2, turning_velocity)
+                    set_goal_velocity(DXL_ID_3, -turning_velocity)
                     print("Turning right with Motors 2 and 3.")
                 elif joystick.get_hat(0) == (-1, 0):  # D-pad Left
                     set_operating_mode(DXL_ID_2, VELOCITY_CONTROL_MODE)
                     set_operating_mode(DXL_ID_3, VELOCITY_CONTROL_MODE)
-                    set_goal_velocity(DXL_ID_2, -turning_velocity)  # Motor 2 turns forward
-                    set_goal_velocity(DXL_ID_3, turning_velocity)  # Motor 3 turns backward
+                    set_goal_velocity(DXL_ID_2, -turning_velocity)
+                    set_goal_velocity(DXL_ID_3, turning_velocity)
                     print("Turning left with Motors 2 and 3.")
             elif event.type == pygame.QUIT:
                 running = False
 finally:
-    enable_torque(DXL_ID_1, TORQUE_DISABLE)  # Disable torque on exit
-    enable_torque(DXL_ID_2, TORQUE_DISABLE)
-    enable_torque(DXL_ID_3, TORQUE_DISABLE)
+    enable_torque([DXL_ID_1, DXL_ID_2, DXL_ID_3], TORQUE_DISABLE)  # Disable torque on exit
     portHandler.closePort()
     pygame.quit()
