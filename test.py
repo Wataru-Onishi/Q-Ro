@@ -43,7 +43,7 @@ POSITION_CONTROL_MODE = 3
 VELOCITY_CONTROL_MODE = 1
 
 # New Goal settings for ID 1 when X button is pressed
-new_goal_current_mA = 20  # Current in mA
+current_limit = 20  # Default current in mA
 new_goal_position = 900  # Position to move to
 
 # Standard positions and velocities
@@ -98,13 +98,16 @@ try:
             if event.type == JOYBUTTONDOWN:
                 if joystick.get_button(0):  # X button
                     set_operating_mode(DXL_ID_1, CURRENT_BASED_POSITION_CONTROL)
-                    set_goal_current(DXL_ID_1, new_goal_current_mA)
+                    set_goal_current(DXL_ID_1, current_limit)
                     set_goal_position(DXL_ID_1, new_goal_position)
-                    print(f"ID 1: Moving to position {new_goal_position} with {new_goal_current_mA}mA.")
+                    print(f"ID 1: Moving to position {new_goal_position} with {current_limit}mA.")
                 elif joystick.get_button(1):  # Circle button
                     set_operating_mode(DXL_ID_1, POSITION_CONTROL_MODE)
                     set_goal_position(DXL_ID_1, standard_position)
                     print(f"ID 1: Moving to position {standard_position}.")
+                elif joystick.get_button(3):  # Square button, toggle current limit
+                    current_limit = 10 if current_limit == 20 else 20
+                    print(f"Current limit toggled to {current_limit}mA.")
                 elif joystick.get_button(4):  # L1 button
                     set_goal_velocity(DXL_ID_2, 0)  # Stop motor 2
                     set_goal_velocity(DXL_ID_3, 0)  # Stop motor 3
