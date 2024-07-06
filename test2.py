@@ -119,6 +119,9 @@ try:
                 elif joystick.get_button(13):  # PS button
                     print("PS button pressed. Exiting program.")
                     running = False
+                else:
+                    # Ignore any other buttons
+                    print(f"Button {event.button} pressed but no action defined.")
             elif event.type == JOYHATMOTION:
                 if joystick.get_hat(0) == (0, 1):  # D-pad Up
                     set_operating_mode(DXL_ID_2, VELOCITY_CONTROL_MODE)
@@ -146,6 +149,7 @@ try:
                     print("Turning left with Motors 2 and 3.")
             elif event.type == pygame.QUIT:
                 running = False
+
 finally:
     enable_torque([DXL_ID_1, DXL_ID_2, DXL_ID_3], TORQUE_DISABLE)  # Disable torque on exit
     portHandler.closePort()
