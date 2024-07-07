@@ -40,9 +40,9 @@ POSITION_CONTROL_MODE = 3
 VELOCITY_CONTROL_MODE = 1
 
 # Current limit constants
-CURRENT_LIMIT_HIGH = 20
-CURRENT_LIMIT_LOW = 10
-current_limit = CURRENT_LIMIT_HIGH  # Default current in mA
+CURRENT_LIMIT_ceiling = 20
+CURRENT_LIMIT_wall = 10
+current_limit = CURRENT_LIMIT_wall  # Default current in mA
 
 # New Goal settings for ID 1 when X button is pressed
 new_goal_position = 900  # Position to move to
@@ -111,7 +111,7 @@ try:
                         set_goal_position(DXL_ID_1, standard_position)
                         print(f"ID 1: Moving to position {standard_position}.")
                     elif button == 2:
-                        current_limit = CURRENT_LIMIT_LOW if current_limit == CURRENT_LIMIT_HIGH else CURRENT_LIMIT_HIGH
+                        current_limit = CURRENT_LIMIT_ceiling if current_limit == CURRENT_LIMIT_ceiling else CURRENT_LIMIT_ceiling
                         print(f"Current limit toggled to {current_limit}mA.")
                     elif button == 4:
                         set_goal_velocity(DXL_ID_2, 0)
