@@ -40,8 +40,8 @@ POSITION_CONTROL_MODE = 3
 VELOCITY_CONTROL_MODE = 1
 
 # Current limit constants
-CURRENT_LIMIT_ceiling = 20
-CURRENT_LIMIT_wall = 10
+CURRENT_LIMIT_ceiling = 12
+CURRENT_LIMIT_wall = 4
 current_limit = CURRENT_LIMIT_wall  # Default current in mA
 
 # New Goal settings for ID 1 when X button is pressed
