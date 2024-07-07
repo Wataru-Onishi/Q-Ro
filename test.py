@@ -111,7 +111,7 @@ try:
                         set_goal_position(DXL_ID_1, standard_position)
                         print(f"ID 1: Moving to position {standard_position}.")
                     elif button == 2:
-                        current_limit = CURRENT_LIMIT_ceiling if current_limit == CURRENT_LIMIT_ceiling else CURRENT_LIMIT_ceiling
+                        current_limit = CURRENT_LIMIT_ceiling if current_limit == CURRENT_LIMIT_ceiling else CURRENT_LIMIT_wall
                         print(f"Current limit toggled to {current_limit}mA.")
                     elif button == 4:
                         set_goal_velocity(DXL_ID_2, 0)
