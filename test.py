@@ -26,8 +26,8 @@ PROTOCOL_VERSION = 2.0
 
 # Default setting
 DXL_ID_1 = 1  # Dynamixel ID for the original motor
-DXL_ID_2 = 2  # Dynamixel ID for the first new motor
-DXL_ID_3 = 3  # Dynamixel ID for the second new motor
+DXL_ID_2 = 3  # Dynamixel ID for the first new motor
+DXL_ID_3 = 2  # Dynamixel ID for the second new motor
 BAUDRATE = 57600
 DEVICENAME = '/dev/DYNAMIXEL'  # The port being used
 
