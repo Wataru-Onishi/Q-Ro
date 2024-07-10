@@ -26,8 +26,8 @@ PROTOCOL_VERSION = 2.0
 
 # Default setting
 DXL_ID_1 = 1  # Dynamixel ID for the original motor
-DXL_ID_2 = 3  # Dynamixel ID for the first new motor
-DXL_ID_3 = 2  # Dynamixel ID for the second new motor
+DXL_ID_2 = 2  # Dynamixel ID for the first new motor
+DXL_ID_3 = 3  # Dynamixel ID for the second new motor
 BAUDRATE = 57600
 DEVICENAME = '/dev/DYNAMIXEL'  # The port being used
 
@@ -49,8 +49,8 @@ new_goal_position = 900  # Position to move to
 
 # Standard positions and velocities
 standard_position = 1800
-forward_velocity = 200
-backward_velocity = -200
+forward_velocity = 100
+backward_velocity = -100
 turning_velocity = 100
 
 # Initialize PortHandler instance
