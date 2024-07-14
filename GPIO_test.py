@@ -5,7 +5,7 @@ import time
 GPIO.setmode(GPIO.BCM)
 
 # 指定されたGPIOピン
-pins = [16, 19, 21, 26]
+pins = [16, 19, 20, 26]
 
 # GPIOピンの設定
 for pin in pins:
