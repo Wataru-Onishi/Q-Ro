@@ -1,4 +1,5 @@
 import os
+import time
 import pygame
 import RPi.GPIO as GPIO
 from pygame.locals import *
@@ -29,6 +30,11 @@ HAT_UP = (0, 1)
 HAT_DOWN = (0, -1)
 HAT_RIGHT = (1, 0)
 HAT_LEFT = (-1, 0)
+
+# Timing constants for auto mode operations
+STOP_DURATION = 1  # Time to stop in seconds
+TURN_DURATION = 5  # Time to turn right in seconds
+MOVE_FORWARD_DURATION = 3  # Time to move forward in seconds
 
 # Dynamixel control table addresses
 ADDR_OPERATING_MODE = 11
@@ -176,10 +182,33 @@ try:
                         print("Turning left with Motors 2 and 3.")
 
             # Check for stop signal in auto mode
-            if current_mode == AUTO_MODE and check_stop_signal():
-                set_goal_velocity(2, 0)
-                set_goal_velocity(3, 0)
-                print("Auto mode stop signal received. Motors stopped.")
+            if current_mode == AUTO_MODE:
+                if check_stop_signal():
+                    # Stop for defined duration
+                    set_goal_velocity(2, 0)
+                    set_goal_velocity(3, 0)
+                    print("Auto mode stop signal received. Motors stopped.")
+                    time.sleep(STOP_DURATION)
+
+                    # Turn right for defined duration
+                    set_operating_mode(2, VELOCITY_CONTROL_MODE)
+                    set_operating_mode(3, VELOCITY_CONTROL_MODE)
+                    set_goal_velocity(2, turning_velocity)
+                    set_goal_velocity(3, -turning_velocity)  # Automatically reversed for ID 3
+                    print(f"Turning right for {TURN_DURATION} seconds.")
+                    time.sleep(TURN_DURATION)
+
+                    # Move forward for defined duration
+                    set_goal_velocity(2, forward_velocity)
+                    set_goal_velocity(3, forward_velocity)
+                    print(f"Moving forward for {MOVE_FORWARD_DURATION} seconds.")
+                    time.sleep(MOVE_FORWARD_DURATION)
+
+                    # Turn right again for defined duration
+                    set_goal_velocity(2, turning_velocity)
+                    set_goal_velocity(3, -turning_velocity)
+                    print(f"Turning right again for {TURN_DURATION} seconds.")
+                    time.sleep(TURN_DURATION)
 
 finally:
     enable_torque(DXL_IDS, TORQUE_DISABLE)
