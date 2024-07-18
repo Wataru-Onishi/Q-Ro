@@ -210,6 +210,9 @@ try:
                     print(f"Turning right again for {TURN_DURATION} seconds.")
                     time.sleep(TURN_DURATION)
 
+                    set_goal_velocity(2, 0)
+                    set_goal_velocity(3, 0)
+
 finally:
     enable_torque(DXL_IDS, TORQUE_DISABLE)
     portHandler.closePort()
