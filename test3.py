@@ -130,6 +130,10 @@ try:
                 if event.button == BUTTON_TOGGLE_MODE:
                     current_mode = AUTO_MODE if current_mode == MANUAL_MODE else MANUAL_MODE
                     print(f"Mode changed to {'AUTO' if current_mode == AUTO_MODE else 'MANUAL'}.")
+                elif event.button == BUTTON_BRAKE_MOTORS:
+                    set_goal_velocity(2, 0)
+                    set_goal_velocity(3, 0)
+                    print("Braking Motors 2 and 3.")
                 elif current_mode == MANUAL_MODE:
                     if event.button == BUTTON_MOVE_TO_POSITION_X:
                         set_operating_mode(1, CURRENT_BASED_POSITION_CONTROL)
@@ -143,10 +147,6 @@ try:
                     elif event.button == BUTTON_TOGGLE_CURRENT_LIMIT:
                         current_limit = CURRENT_LIMIT_LOW if current_limit == CURRENT_LIMIT_HIGH else CURRENT_LIMIT_HIGH
                         print(f"Current limit toggled to {current_limit}mA.")
-                    elif event.button == BUTTON_BRAKE_MOTORS:
-                        set_goal_velocity(2, 0)
-                        set_goal_velocity(3, 0)
-                        print("Braking Motors 2 and 3.")
                     elif event.button == BUTTON_EXIT_PROGRAM:
                         print("PS button pressed. Exiting program.")
                         running = False
@@ -177,6 +177,7 @@ try:
                     print("Turning left with Motors 2 and 3.")
         if current_mode == AUTO_MODE:
             sensor_based_movement()
+
 finally:
     enable_torque(DXL_IDS, TORQUE_DISABLE)  # Disable torque on exit
     portHandler.closePort()
