@@ -25,10 +25,10 @@ BUTTON_TOGGLE_MODE = 5
 BUTTON_EXIT_PROGRAM = 10
 
 # Define hat (D-pad) mappings
-HAT_UP = (1, 0)
-HAT_DOWN = (-1, 0)
-HAT_RIGHT = (0, 1)
-HAT_LEFT = (0, -1)
+HAT_UP = (0, 1)
+HAT_DOWN = (0, -1)
+HAT_RIGHT = (1, 0)
+HAT_LEFT = (-1, 0)
 
 # Dynamixel control table addresses
 ADDR_OPERATING_MODE = 11
@@ -98,6 +98,8 @@ def set_goal_position(id, position):
     packetHandler.write4ByteTxRx(portHandler, id, ADDR_GOAL_POSITION, position)
 
 def set_goal_velocity(id, velocity):
+    if id == 3:
+        velocity = -velocity  # Reverse velocity for ID 3
     packetHandler.write4ByteTxRx(portHandler, id, ADDR_GOAL_VELOCITY, velocity)
 
 def check_stop_signal():
@@ -138,39 +140,19 @@ try:
                         print(f"Current limit toggled to {current_limit}mA.")
 
             elif event.type == JOYHATMOTION:
-                if current_mode == MANUAL_MODE:
-                    if joystick.get_hat(0) == HAT_UP:
+                if joystick.get_hat(0) == HAT_UP:
+                    if current_mode == AUTO_MODE:
+                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
+                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
+                        set_goal_velocity(2, forward_velocity)
+                        set_goal_velocity(3, forward_velocity)  # Automatically reversed for ID 3
+                        print("Initiated auto-forward in auto mode.")
+                    elif current_mode == MANUAL_MODE:
                         set_operating_mode(2, VELOCITY_CONTROL_MODE)
                         set_operating_mode(3, VELOCITY_CONTROL_MODE)
                         set_goal_velocity(2, forward_velocity)
                         set_goal_velocity(3, forward_velocity)
                         print("Motors 2 and 3 are set to move forward at controlled speed.")
-                    elif joystick.get_hat(0) == HAT_DOWN:
-                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
-                        set_goal_velocity(2, backward_velocity)
-                        set_goal_velocity(3, backward_velocity)
-                        print("Motors 2 and 3 are set to move backward at controlled speed.")
-                    elif joystick.get_hat(0) == HAT_RIGHT:
-                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
-                        set_goal_velocity(2, turning_velocity)
-                        set_goal_velocity(3, -turning_velocity)
-                        print("Turning right with Motors 2 and 3.")
-                    elif joystick.get_hat(0) == HAT_LEFT:
-                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
-                        set_goal_velocity(2, -turning_velocity)
-                        set_goal_velocity(3, turning_velocity)
-                        print("Turning left with Motors 2 and 3.")
-
-                elif current_mode == AUTO_MODE:
-                    if joystick.get_hat(0) == HAT_UP:
-                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
-                        set_goal_velocity(2, forward_velocity)
-                        set_goal_velocity(3, forward_velocity)
-                        print("Initiated auto-forward in auto mode.")
 
             # Check for stop signal in auto mode
             if current_mode == AUTO_MODE and check_stop_signal():
