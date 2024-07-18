@@ -25,10 +25,10 @@ BUTTON_TOGGLE_MODE = 5
 BUTTON_EXIT_PROGRAM = 10
 
 # Define hat (D-pad) mappings
-HAT_UP = (1, 0)
-HAT_DOWN = (-1, 0)
-HAT_RIGHT = (0, 1)
-HAT_LEFT = (0, -1)
+HAT_UP = (0, 1)
+HAT_DOWN = (0, -1)
+HAT_RIGHT = (1, 0)
+HAT_LEFT = (-1, 0)
 
 # Dynamixel control table addresses
 ADDR_OPERATING_MODE = 11
@@ -37,10 +37,6 @@ ADDR_GOAL_CURRENT = 102
 ADDR_GOAL_VELOCITY = 104
 ADDR_GOAL_POSITION = 116
 ADDR_PRESENT_POSITION = 132
-
-# Dynamixel data byte lengths
-LEN_GOAL_CURRENT = 2
-LEN_GOAL_POSITION = 4
 
 # Protocol version
 PROTOCOL_VERSION = 2.0
@@ -61,13 +57,6 @@ VELOCITY_CONTROL_MODE = 1
 CURRENT_LIMIT_HIGH = 12
 CURRENT_LIMIT_LOW = 4
 current_limit = CURRENT_LIMIT_HIGH
-
-# Position and velocity settings
-new_goal_position = 900
-standard_position = 1800
-forward_velocity = 100
-backward_velocity = -100
-turning_velocity = 100
 
 # Mode settings
 MANUAL_MODE = 0
@@ -104,18 +93,8 @@ def set_goal_position(id, position):
 def set_goal_velocity(id, velocity):
     packetHandler.write4ByteTxRx(portHandler, id, ADDR_GOAL_VELOCITY, velocity)
 
-def sensor_based_movement():
-    inputs = [GPIO.input(pin) for pin in sensor_pins]
-    if inputs == [1, 0, 0, 0]:
-        # Move forward
-        set_operating_mode(2, VELOCITY_CONTROL_MODE)
-        set_operating_mode(3, VELOCITY_CONTROL_MODE)
-        set_goal_velocity(2, forward_velocity)
-        set_goal_velocity(3, forward_velocity)
-    elif inputs == [0, 1, 0, 0]:
-        # Stop
-        set_goal_velocity(2, 0)
-        set_goal_velocity(3, 0)
+def check_stop_signal():
+    return GPIO.input(26)  # Return the current state of GPIO 26
 
 # Enable torque for all motors
 enable_torque(DXL_IDS, TORQUE_ENABLE)
@@ -134,52 +113,51 @@ try:
                     set_goal_velocity(2, 0)
                     set_goal_velocity(3, 0)
                     print("Braking Motors 2 and 3.")
-                elif current_mode == MANUAL_MODE:
-                    if event.button == BUTTON_MOVE_TO_POSITION_X:
-                        set_operating_mode(1, CURRENT_BASED_POSITION_CONTROL)
-                        set_goal_current(1, current_limit)
-                        set_goal_position(1, new_goal_position)
-                        print(f"ID 1: Moving to position {new_goal_position} with {current_limit}mA.")
-                    elif event.button == BUTTON_MOVE_TO_STANDARD_POSITION:
-                        set_operating_mode(1, POSITION_CONTROL_MODE)
-                        set_goal_position(1, standard_position)
-                        print(f"ID 1: Moving to position {standard_position}.")
-                    elif event.button == BUTTON_TOGGLE_CURRENT_LIMIT:
-                        current_limit = CURRENT_LIMIT_LOW if current_limit == CURRENT_LIMIT_HIGH else CURRENT_LIMIT_HIGH
-                        print(f"Current limit toggled to {current_limit}mA.")
-                    elif event.button == BUTTON_EXIT_PROGRAM:
-                        print("PS button pressed. Exiting program.")
-                        running = False
-            elif event.type == JOYHATMOTION and current_mode == MANUAL_MODE:
-                if joystick.get_hat(0) == HAT_UP:
+                elif event.button == BUTTON_EXIT_PROGRAM:
+                    print("PS button pressed. Exiting program.")
+                    running = False
+
+            elif event.type == JOYHATMOTION:
+                if joystick.get_hat(0) == HAT_UP and current_mode == AUTO_MODE:
                     set_operating_mode(2, VELOCITY_CONTROL_MODE)
                     set_operating_mode(3, VELOCITY_CONTROL_MODE)
                     set_goal_velocity(2, forward_velocity)
                     set_goal_velocity(3, forward_velocity)
-                    print("Motors 2 and 3 are set to move forward at controlled speed.")
-                elif joystick.get_hat(0) == HAT_DOWN:
-                    set_operating_mode(2, VELOCITY_CONTROL_MODE)
-                    set_operating_mode(3, VELOCITY_CONTROL_MODE)
-                    set_goal_velocity(2, backward_velocity)
-                    set_goal_velocity(3, backward_velocity)
-                    print("Motors 2 and 3 are set to move backward at controlled speed.")
-                elif joystick.get_hat(0) == HAT_RIGHT:
-                    set_operating_mode(2, VELOCITY_CONTROL_MODE)
-                    set_operating_mode(3, VELOCITY_CONTROL_MODE)
-                    set_goal_velocity(2, turning_velocity)
-                    set_goal_velocity(3, -turning_velocity)
-                    print("Turning right with Motors 2 and 3.")
-                elif joystick.get_hat(0) == HAT_LEFT:
-                    set_operating_mode(2, VELOCITY_CONTROL_MODE)
-                    set_operating_mode(3, VELOCITY_CONTROL_MODE)
-                    set_goal_velocity(2, -turning_velocity)
-                    set_goal_velocity(3, turning_velocity)
-                    print("Turning left with Motors 2 and 3.")
-        if current_mode == AUTO_MODE:
-            sensor_based_movement()
+                    print("Initiated auto-forward in auto mode.")
+                elif current_mode == MANUAL_MODE:
+                    if joystick.get_hat(0) == HAT_UP:
+                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
+                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
+                        set_goal_velocity(2, forward_velocity)
+                        set_goal_velocity(3, forward_velocity)
+                        print("Motors 2 and 3 are set to move forward at controlled speed.")
+                    elif joystick.get_hat(0) == HAT_DOWN:
+                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
+                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
+                        set_goal_velocity(2, backward_velocity)
+                        set_goal_velocity(3, backward_velocity)
+                        print("Motors 2 and 3 are set to move backward at controlled speed.")
+                    elif joystick.get_hat(0) == HAT_RIGHT:
+                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
+                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
+                        set_goal_velocity(2, turning_velocity)
+                        set_goal_velocity(3, -turning_velocity)
+                        print("Turning right with Motors 2 and 3.")
+                    elif joystick.get_hat(0) == HAT_LEFT:
+                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
+                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
+                        set_goal_velocity(2, -turning_velocity)
+                        set_goal_velocity(3, turning_velocity)
+                        print("Turning left with Motors 2 and 3.")
+
+            # Check for stop signal in auto mode
+            if current_mode == AUTO_MODE and check_stop_signal():
+                set_goal_velocity(2, 0)
+                set_goal_velocity(3, 0)
+                print("Auto mode stop signal received. Motors stopped.")
 
 finally:
-    enable_torque(DXL_IDS, TORQUE_DISABLE)  # Disable torque on exit
+    enable_torque(DXL_IDS, TORQUE_DISABLE)
     portHandler.closePort()
     pygame.quit()
     GPIO.cleanup()
