@@ -17,9 +17,9 @@ BUTTON_BRAKE_MOTORS = 4  # L1 button on PS4 controller
 BUTTON_EXIT_PROGRAM = 10  # PS button on PS4 controller
 
 # Define hat (D-pad) mappings
-HAT_UP = (0, 1)        # D-pad Up
+HAT_UP = (1, 0)        # D-pad Up
 HAT_DOWN = (0, -1)     # D-pad Down
-HAT_RIGHT = (1, 0)     # D-pad Right
+HAT_RIGHT = (0, 1)     # D-pad Right
 HAT_LEFT = (-1, 0)     # D-pad Left
 
 # Dynamixel control table addresses
