@@ -25,10 +25,10 @@ BUTTON_TOGGLE_MODE = 5
 BUTTON_EXIT_PROGRAM = 10
 
 # Define hat (D-pad) mappings
-HAT_UP = (0, 1)
-HAT_DOWN = (0, -1)
-HAT_RIGHT = (1, 0)
-HAT_LEFT = (-1, 0)
+HAT_UP = (1, 0)
+HAT_DOWN = (-1, 0)
+HAT_RIGHT = (0, 1)
+HAT_LEFT = (0, -1)
 
 # Dynamixel control table addresses
 ADDR_OPERATING_MODE = 11
