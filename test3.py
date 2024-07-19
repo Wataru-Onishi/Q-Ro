@@ -147,34 +147,31 @@ try:
                         print(f"Current limit toggled to {current_limit}mA.")
 
             elif event.type == JOYHATMOTION:
-                if joystick.get_hat(0) == HAT_UP:
-                    if current_mode == MANUAL_MODE:
+                if current_mode == MANUAL_MODE:
+                    if joystick.get_hat(0) == HAT_UP:
                         set_operating_mode(2, VELOCITY_CONTROL_MODE)
                         set_operating_mode(3, VELOCITY_CONTROL_MODE)
                         set_goal_velocity(2, forward_velocity)
                         set_goal_velocity(3, forward_velocity)
                         print("Motors 2 and 3 are set to move forward at controlled speed.")
                     elif joystick.get_hat(0) == HAT_DOWN:
-                        if current_mode == MANUAL_MODE:
-                            set_operating_mode(2, VELOCITY_CONTROL_MODE)
-                            set_operating_mode(3, VELOCITY_CONTROL_MODE)
-                            set_goal_velocity(2, backward_velocity)
-                            set_goal_velocity(3, backward_velocity)
-                            print("Motors 2 and 3 are set to move backward at controlled speed.")
+                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
+                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
+                        set_goal_velocity(2, backward_velocity)
+                        set_goal_velocity(3, backward_velocity)
+                        print("Motors 2 and 3 are set to move backward at controlled speed.")
                     elif joystick.get_hat(0) == HAT_RIGHT:
-                        if current_mode == MANUAL_MODE:
-                            set_operating_mode(2, VELOCITY_CONTROL_MODE)
-                            set_operating_mode(3, VELOCITY_CONTROL_MODE)
-                            set_goal_velocity(2, turning_velocity)
-                            set_goal_velocity(3, -turning_velocity)
-                            print("Turning right with Motors 2 and 3.")
+                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
+                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
+                        set_goal_velocity(2, turning_velocity)
+                        set_goal_velocity(3, -turning_velocity)
+                        print("Turning right with Motors 2 and 3.")
                     elif joystick.get_hat(0) == HAT_LEFT:
-                        if current_mode == MANUAL_MODE:
-                            set_operating_mode(2, VELOCITY_CONTROL_MODE)
-                            set_operating_mode(3, VELOCITY_CONTROL_MODE)
-                            set_goal_velocity(2, -turning_velocity)
-                            set_goal_velocity(3, turning_velocity)
-                            print("Turning left with Motors 2 and 3.")
+                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
+                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
+                        set_goal_velocity(2, -turning_velocity)
+                        set_goal_velocity(3, turning_velocity)
+                        print("Turning left with Motors 2 and 3.")
 
         if current_mode == AUTO_MODE:
             set_operating_mode(2, VELOCITY_CONTROL_MODE)
