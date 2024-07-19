@@ -177,27 +177,56 @@ try:
                         set_goal_velocity(2, -turning_velocity)
                         set_goal_velocity(3, turning_velocity)
                         print("Turning left with Motors 2 and 3.")
-                elif current_mode == AUTO_MODE and joystick.get_hat(0) == HAT_UP:
-                    print("AUTO MODE: Executing predefined sequence.")
-                    # Stop sequence
-                    set_goal_velocity(2, 0)
+                elif current_mode == AUTO_MODE:
+                    set_goal_velocity(2, 0)  # 初期状態でモーターを停止
                     set_goal_velocity(3, 0)
-                    time.sleep(STOP_DURATION)
-                    # Turn right sequence
-                    set_goal_velocity(2, turning_velocity)
-                    set_goal_velocity(3, -turning_velocity)
-                    time.sleep(TURN_DURATION)
-                    # Move forward sequence
-                    set_goal_velocity(2, forward_velocity)
-                    set_goal_velocity(3, forward_velocity)
-                    time.sleep(MOVE_FORWARD_DURATION)
-                    # Final turn right sequence
-                    set_goal_velocity(2, turning_velocity)
-                    set_goal_velocity(3, -turning_velocity)
-                    time.sleep(TURN_DURATION)
-                    set_goal_velocity(2, 0)
-                    set_goal_velocity(3, 0)
-                    print("Sequence complete. Motors stopped.")
+                    print("AUTO MODE: Motors stopped. Waiting for HAT_UP to start moving forward.")
+
+                    auto_mode_active = False  # HAT_UPを押すまで前進しない
+                    while running:
+                        for event in pygame.event.get():
+                            if event.type == JOYHATMOTION:
+                                if joystick.get_hat(0) == HAT_UP:
+                                    auto_mode_active = True
+                                    print("AUTO MODE: Moving forward initiated by HAT_UP.")
+                                    set_goal_velocity(2, forward_velocity)
+                                    set_goal_velocity(3, forward_velocity)  # ID 3は速度を反転
+
+                            if auto_mode_active:
+                                if check_stop_signal():
+                                    print("AUTO MODE: GPIO26 triggered, executing sequence.")
+                                    # 停止
+                                    set_goal_velocity(2, 0)
+                                    set_goal_velocity(3, 0)
+                                    time.sleep(STOP_DURATION)
+
+                                    # 右旋回
+                                    set_goal_velocity(2, turning_velocity)
+                                    set_goal_velocity(3, -turning_velocity)
+                                    time.sleep(TURN_DURATION)
+
+                                    # 前進
+                                    set_goal_velocity(2, forward_velocity)
+                                    set_goal_velocity(3, forward_velocity)
+                                    time.sleep(MOVE_FORWARD_DURATION)
+
+                                    # 右旋回
+                                    set_goal_velocity(2, turning_velocity)
+                                    set_goal_velocity(3, -turning_velocity)
+                                    time.sleep(TURN_DURATION)
+
+                                    set_goal_velocity(2, 0)
+                                    set_goal_velocity(3, 0)
+                                    print("AUTO MODE: Sequence complete. Motors stopped.")
+                                    auto_mode_active = False  # シーケンス終了後は再び停止状態に戻る
+
+                            if event.type == JOYBUTTONDOWN and event.button == BUTTON_EXIT_PROGRAM:
+                                print("PS button pressed. Exiting program.")
+                                running = False
+                                break
+
+                        if not running:
+                            break
 
 finally:
     enable_torque(DXL_IDS, TORQUE_DISABLE)
