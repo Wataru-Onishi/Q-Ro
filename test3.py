@@ -35,6 +35,7 @@ HAT_LEFT = (-1, 0)
 STOP_DURATION = 1  # Time to stop in seconds
 TURN_DURATION = 5  # Time to turn right in seconds
 MOVE_FORWARD_DURATION = 3  # Time to move forward in seconds
+SENSOR_SAMPLING_INTERVAL = 0.1  # Time between sensor checks in seconds
 
 # Dynamixel control table addresses
 ADDR_OPERATING_MODE = 11
@@ -145,73 +146,37 @@ try:
                         current_limit = CURRENT_LIMIT_LOW if current_limit == CURRENT_LIMIT_HIGH else CURRENT_LIMIT_HIGH
                         print(f"Current limit toggled to {current_limit}mA.")
 
-            elif event.type == JOYHATMOTION:
-                if joystick.get_hat(0) == HAT_UP:
-                    if current_mode == AUTO_MODE:
-                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
-                        set_goal_velocity(2, forward_velocity)
-                        set_goal_velocity(3, forward_velocity)  # Automatically reversed for ID 3
-                        print("Initiated auto-forward in auto mode.")
-                    elif current_mode == MANUAL_MODE:
-                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
-                        set_goal_velocity(2, forward_velocity)
-                        set_goal_velocity(3, forward_velocity)
-                        print("Motors 2 and 3 are set to move forward at controlled speed.")
-                elif joystick.get_hat(0) == HAT_DOWN:
-                    if current_mode == MANUAL_MODE:
-                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
-                        set_goal_velocity(2, backward_velocity)
-                        set_goal_velocity(3, backward_velocity)
-                        print("Motors 2 and 3 are set to move backward at controlled speed.")
-                elif joystick.get_hat(0) == HAT_RIGHT:
-                    if current_mode == MANUAL_MODE:
-                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
-                        set_goal_velocity(2, turning_velocity)
-                        set_goal_velocity(3, -turning_velocity)
-                        print("Turning right with Motors 2 and 3.")
-                elif joystick.get_hat(0) == HAT_LEFT:
-                    if current_mode == MANUAL_MODE:
-                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
-                        set_goal_velocity(2, -turning_velocity)
-                        set_goal_velocity(3, turning_velocity)
-                        print("Turning left with Motors 2 and 3.")
-
-            # Check for stop signal in auto mode
-            if current_mode == AUTO_MODE:
+        if current_mode == AUTO_MODE:
+            set_operating_mode(2, VELOCITY_CONTROL_MODE)
+            set_operating_mode(3, VELOCITY_CONTROL_MODE)
+            set_goal_velocity(2, forward_velocity)
+            set_goal_velocity(3, forward_velocity)
+            print("AUTO MODE: Moving forward.")
+            last_time = time.time()
+            while time.time() - last_time < MOVE_FORWARD_DURATION:
+                time.sleep(SENSOR_SAMPLING_INTERVAL)
                 if check_stop_signal():
-                    # Stop for defined duration
+                    # Execute the stop-turn-move-turn sequence
+                    print("Sensor triggered, executing sequence.")
                     set_goal_velocity(2, 0)
                     set_goal_velocity(3, 0)
-                    print("Auto mode stop signal received. Motors stopped.")
                     time.sleep(STOP_DURATION)
 
-                    # Turn right for defined duration
-                    set_operating_mode(2, VELOCITY_CONTROL_MODE)
-                    set_operating_mode(3, VELOCITY_CONTROL_MODE)
-                    set_goal_velocity(2, turning_velocity)
-                    set_goal_velocity(3, -turning_velocity)  # Automatically reversed for ID 3
-                    print(f"Turning right for {TURN_DURATION} seconds.")
-                    time.sleep(TURN_DURATION)
-
-                    # Move forward for defined duration
-                    set_goal_velocity(2, forward_velocity)
-                    set_goal_velocity(3, forward_velocity)
-                    print(f"Moving forward for {MOVE_FORWARD_DURATION} seconds.")
-                    time.sleep(MOVE_FORWARD_DURATION)
-
-                    # Turn right again for defined duration
                     set_goal_velocity(2, turning_velocity)
                     set_goal_velocity(3, -turning_velocity)
-                    print(f"Turning right again for {TURN_DURATION} seconds.")
+                    time.sleep(TURN_DURATION)
+
+                    set_goal_velocity(2, forward_velocity)
+                    set_goal_velocity(3, forward_velocity)
+                    time.sleep(MOVE_FORWARD_DURATION)
+
+                    set_goal_velocity(2, turning_velocity)
+                    set_goal_velocity(3, -turning_velocity)
                     time.sleep(TURN_DURATION)
 
                     set_goal_velocity(2, 0)
                     set_goal_velocity(3, 0)
+                    break
 
 finally:
     enable_torque(DXL_IDS, TORQUE_DISABLE)
