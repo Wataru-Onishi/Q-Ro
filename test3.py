@@ -124,7 +124,12 @@ try:
             if event.type == JOYBUTTONDOWN:
                 if event.button == BUTTON_TOGGLE_MODE:
                     current_mode = AUTO_MODE if current_mode == MANUAL_MODE else MANUAL_MODE
-                    print(f"Mode changed to {'AUTO' if current_mode == AUTO_MODE else 'MANUAL'}.")
+                    if current_mode == AUTO_MODE:
+                        set_goal_velocity(2, 0)  # Stop all motors when entering auto mode
+                        set_goal_velocity(3, 0)
+                        print("Switched to AUTO MODE. Motors stopped.")
+                    else:
+                        print("Switched to MANUAL MODE.")
                 elif event.button == BUTTON_BRAKE_MOTORS:
                     set_goal_velocity(2, 0)
                     set_goal_velocity(3, 0)
@@ -172,38 +177,27 @@ try:
                         set_goal_velocity(2, -turning_velocity)
                         set_goal_velocity(3, turning_velocity)
                         print("Turning left with Motors 2 and 3.")
-
-        if current_mode == AUTO_MODE:
-            set_operating_mode(2, VELOCITY_CONTROL_MODE)
-            set_operating_mode(3, VELOCITY_CONTROL_MODE)
-            set_goal_velocity(2, forward_velocity)
-            set_goal_velocity(3, forward_velocity)
-            print("AUTO MODE: Moving forward.")
-            last_time = time.time()
-            while time.time() - last_time < MOVE_FORWARD_DURATION:
-                time.sleep(SENSOR_SAMPLING_INTERVAL)
-                if check_stop_signal():
-                    # Execute the stop-turn-move-turn sequence
-                    print("Sensor triggered, executing sequence.")
+                elif current_mode == AUTO_MODE and joystick.get_hat(0) == HAT_UP:
+                    print("AUTO MODE: Executing predefined sequence.")
+                    # Stop sequence
                     set_goal_velocity(2, 0)
                     set_goal_velocity(3, 0)
                     time.sleep(STOP_DURATION)
-
+                    # Turn right sequence
                     set_goal_velocity(2, turning_velocity)
                     set_goal_velocity(3, -turning_velocity)
                     time.sleep(TURN_DURATION)
-
+                    # Move forward sequence
                     set_goal_velocity(2, forward_velocity)
                     set_goal_velocity(3, forward_velocity)
                     time.sleep(MOVE_FORWARD_DURATION)
-
+                    # Final turn right sequence
                     set_goal_velocity(2, turning_velocity)
                     set_goal_velocity(3, -turning_velocity)
                     time.sleep(TURN_DURATION)
-
                     set_goal_velocity(2, 0)
                     set_goal_velocity(3, 0)
-                    break
+                    print("Sequence complete. Motors stopped.")
 
 finally:
     enable_torque(DXL_IDS, TORQUE_DISABLE)
