@@ -178,6 +178,7 @@ try:
                         set_goal_velocity(3, turning_velocity)
                         print("Turning left with Motors 2 and 3.")
                 # オートモードでの動作を定義
+                # オートモードでの動作を定義
                 if current_mode == AUTO_MODE:
                     set_goal_velocity(2, 0)  # 初期状態でモーターを停止
                     set_goal_velocity(3, 0)
@@ -218,16 +219,48 @@ try:
                                 set_goal_velocity(3, forward_velocity)
                                 time.sleep(MOVE_FORWARD_DURATION)
 
-                                # 右旋回
+                                # 左旋回
                                 set_goal_velocity(2, -turning_velocity)
                                 set_goal_velocity(3, turning_velocity)
                                 time.sleep(TURN_DURATION)
 
-                                set_goal_velocity(2, 0)
-                                set_goal_velocity(3, 0)
-                                print("AUTO MODE: Sequence complete. Motors stopped.")
-                                auto_mode_active = False  # シーケンス終了後は再び停止状態に戻る
-                                break  # シーケンス後のループを終了
+                                # シーケンス完了後、後進を開始
+                                print("Starting backward movement.")
+                                set_goal_velocity(2, backward_velocity)
+                                set_goal_velocity(3, backward_velocity)
+
+                                # 後進中にGPIO20がHIGHを検出した場合の処理
+                                while True:
+                                    time.sleep(SENSOR_SAMPLING_INTERVAL)
+                                    if GPIO.input(20):  # GPIO20の状態をチェック
+                                        print("GPIO20 triggered, executing new sequence.")
+                                        # 停止
+                                        set_goal_velocity(2, 0)
+                                        set_goal_velocity(3, 0)
+                                        time.sleep(STOP_DURATION)
+
+                                        # 左旋回
+                                        set_goal_velocity(2, -turning_velocity)
+                                        set_goal_velocity(3, turning_velocity)
+                                        time.sleep(TURN_DURATION)
+
+                                        # 前進
+                                        set_goal_velocity(2, forward_velocity)
+                                        set_goal_velocity(3, forward_velocity)
+                                        time.sleep(MOVE_FORWARD_DURATION)
+
+                                        # 右旋回
+                                        set_goal_velocity(2, turning_velocity)
+                                        set_goal_velocity(3, -turning_velocity)
+                                        time.sleep(TURN_DURATION)
+
+                                        set_goal_velocity(2, 0)
+                                        set_goal_velocity(3, 0)
+                                        print("New sequence complete. Motors stopped.")
+                                        auto_mode_active = False
+                                        break
+                                break
+
 
 
 finally:
