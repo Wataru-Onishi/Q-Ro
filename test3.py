@@ -33,7 +33,7 @@ HAT_LEFT = (-1, 0)
 
 # Timing constants for auto mode operations
 STOP_DURATION = 1  # Time to stop in seconds
-TURN_DURATION = 3  # Time to turn right in seconds
+TURN_DURATION = 2.5  # Time to turn right in seconds
 MOVE_FORWARD_DURATION = 2  # Time to move forward in seconds
 SENSOR_SAMPLING_INTERVAL = 0.1  # Time between sensor checks in seconds
 
@@ -219,8 +219,8 @@ try:
                                 time.sleep(MOVE_FORWARD_DURATION)
 
                                 # 右旋回
-                                set_goal_velocity(2, turning_velocity)
-                                set_goal_velocity(3, -turning_velocity)
+                                set_goal_velocity(2, -turning_velocity)
+                                set_goal_velocity(3, turning_velocity)
                                 time.sleep(TURN_DURATION)
 
                                 set_goal_velocity(2, 0)
