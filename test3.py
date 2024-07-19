@@ -177,56 +177,58 @@ try:
                         set_goal_velocity(2, -turning_velocity)
                         set_goal_velocity(3, turning_velocity)
                         print("Turning left with Motors 2 and 3.")
-                elif current_mode == AUTO_MODE:
+                # オートモードでの動作を定義
+                if current_mode == AUTO_MODE:
                     set_goal_velocity(2, 0)  # 初期状態でモーターを停止
                     set_goal_velocity(3, 0)
                     print("AUTO MODE: Motors stopped. Waiting for HAT_UP to start moving forward.")
 
                     auto_mode_active = False  # HAT_UPを押すまで前進しない
-                    while running:
+                    continue_auto_mode = True  # 自動モードの継続フラグ
+                    while continue_auto_mode:
                         for event in pygame.event.get():
                             if event.type == JOYHATMOTION:
-                                if joystick.get_hat(0) == HAT_UP:
+                                if joystick.get_hat(0) == HAT_UP and not auto_mode_active:
                                     auto_mode_active = True
                                     print("AUTO MODE: Moving forward initiated by HAT_UP.")
                                     set_goal_velocity(2, forward_velocity)
                                     set_goal_velocity(3, forward_velocity)  # ID 3は速度を反転
 
-                            if auto_mode_active:
-                                if check_stop_signal():
-                                    print("AUTO MODE: GPIO26 triggered, executing sequence.")
-                                    # 停止
-                                    set_goal_velocity(2, 0)
-                                    set_goal_velocity(3, 0)
-                                    time.sleep(STOP_DURATION)
-
-                                    # 右旋回
-                                    set_goal_velocity(2, turning_velocity)
-                                    set_goal_velocity(3, -turning_velocity)
-                                    time.sleep(TURN_DURATION)
-
-                                    # 前進
-                                    set_goal_velocity(2, forward_velocity)
-                                    set_goal_velocity(3, forward_velocity)
-                                    time.sleep(MOVE_FORWARD_DURATION)
-
-                                    # 右旋回
-                                    set_goal_velocity(2, turning_velocity)
-                                    set_goal_velocity(3, -turning_velocity)
-                                    time.sleep(TURN_DURATION)
-
-                                    set_goal_velocity(2, 0)
-                                    set_goal_velocity(3, 0)
-                                    print("AUTO MODE: Sequence complete. Motors stopped.")
-                                    auto_mode_active = False  # シーケンス終了後は再び停止状態に戻る
-
                             if event.type == JOYBUTTONDOWN and event.button == BUTTON_EXIT_PROGRAM:
                                 print("PS button pressed. Exiting program.")
-                                running = False
+                                continue_auto_mode = False  # 自動モードを終了
                                 break
 
-                        if not running:
-                            break
+                        if auto_mode_active:
+                            # 前進中にGPIO26がHIGHを検出した場合の処理
+                            if check_stop_signal():
+                                print("AUTO MODE: GPIO26 triggered, executing sequence.")
+                                # 停止
+                                set_goal_velocity(2, 0)
+                                set_goal_velocity(3, 0)
+                                time.sleep(STOP_DURATION)
+
+                                # 右旋回
+                                set_goal_velocity(2, turning_velocity)
+                                set_goal_velocity(3, -turning_velocity)
+                                time.sleep(TURN_DURATION)
+
+                                # 前進
+                                set_goal_velocity(2, forward_velocity)
+                                set_goal_velocity(3, forward_velocity)
+                                time.sleep(MOVE_FORWARD_DURATION)
+
+                                # 右旋回
+                                set_goal_velocity(2, turning_velocity)
+                                set_goal_velocity(3, -turning_velocity)
+                                time.sleep(TURN_DURATION)
+
+                                set_goal_velocity(2, 0)
+                                set_goal_velocity(3, 0)
+                                print("AUTO MODE: Sequence complete. Motors stopped.")
+                                auto_mode_active = False  # シーケンス終了後は再び停止状態に戻る
+                                break  # シーケンス後のループを終了
+
 
 finally:
     enable_torque(DXL_IDS, TORQUE_DISABLE)
