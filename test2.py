@@ -1,4 +1,5 @@
 import os
+import time
 import pygame
 import RPi.GPIO as GPIO
 from pygame.locals import *
@@ -25,10 +26,16 @@ BUTTON_TOGGLE_MODE = 5
 BUTTON_EXIT_PROGRAM = 10
 
 # Define hat (D-pad) mappings
-HAT_UP = (1, 0)
-HAT_DOWN = (-1, 0)
-HAT_RIGHT = (0, 1)
-HAT_LEFT = (0, -1)
+HAT_UP = (0, 1)
+HAT_DOWN = (0, -1)
+HAT_RIGHT = (1, 0)
+HAT_LEFT = (-1, 0)
+
+# Timing constants for auto mode operations
+STOP_DURATION = 1  # Time to stop in seconds
+TURN_DURATION = 2  # Time to turn right in seconds
+MOVE_FORWARD_DURATION = 2  # Time to move forward in seconds
+SENSOR_SAMPLING_INTERVAL = 0.1  # Time between sensor checks in seconds
 
 # Dynamixel control table addresses
 ADDR_OPERATING_MODE = 11
@@ -60,9 +67,9 @@ current_limit = CURRENT_LIMIT_HIGH
 
 # Position and velocity settings
 standard_position = 2048
-forward_velocity = 100
-backward_velocity = -100
-turning_velocity = 50
+forward_velocity = 300
+backward_velocity = -300
+turning_velocity = 100
 new_goal_position = 4096
 
 # Mode settings
@@ -98,6 +105,8 @@ def set_goal_position(id, position):
     packetHandler.write4ByteTxRx(portHandler, id, ADDR_GOAL_POSITION, position)
 
 def set_goal_velocity(id, velocity):
+    if id == 3:
+        velocity = -velocity  # Reverse velocity for ID 3
     packetHandler.write4ByteTxRx(portHandler, id, ADDR_GOAL_VELOCITY, velocity)
 
 def check_stop_signal():
@@ -115,7 +124,12 @@ try:
             if event.type == JOYBUTTONDOWN:
                 if event.button == BUTTON_TOGGLE_MODE:
                     current_mode = AUTO_MODE if current_mode == MANUAL_MODE else MANUAL_MODE
-                    print(f"Mode changed to {'AUTO' if current_mode == AUTO_MODE else 'MANUAL'}.")
+                    if current_mode == AUTO_MODE:
+                        set_goal_velocity(2, 0)  # Stop all motors when entering auto mode
+                        set_goal_velocity(3, 0)
+                        print("Switched to AUTO MODE. Motors stopped.")
+                    else:
+                        print("Switched to MANUAL MODE.")
                 elif event.button == BUTTON_BRAKE_MOTORS:
                     set_goal_velocity(2, 0)
                     set_goal_velocity(3, 0)
@@ -163,20 +177,58 @@ try:
                         set_goal_velocity(2, -turning_velocity)
                         set_goal_velocity(3, turning_velocity)
                         print("Turning left with Motors 2 and 3.")
+                # オートモードでの動作を定義
+                if current_mode == AUTO_MODE:
+                    set_goal_velocity(2, 0)  # 初期状態でモーターを停止
+                    set_goal_velocity(3, 0)
+                    print("AUTO MODE: Motors stopped. Waiting for HAT_UP to start moving forward.")
 
-                elif current_mode == AUTO_MODE:
-                    if joystick.get_hat(0) == HAT_UP:
-                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
-                        set_goal_velocity(2, forward_velocity)
-                        set_goal_velocity(3, forward_velocity)
-                        print("Initiated auto-forward in auto mode.")
+                    auto_mode_active = False  # HAT_UPを押すまで前進しない
+                    continue_auto_mode = True  # 自動モードの継続フラグ
+                    while continue_auto_mode:
+                        for event in pygame.event.get():
+                            if event.type == JOYHATMOTION:
+                                if joystick.get_hat(0) == HAT_UP and not auto_mode_active:
+                                    auto_mode_active = True
+                                    print("AUTO MODE: Moving forward initiated by HAT_UP.")
+                                    set_goal_velocity(2, forward_velocity)
+                                    set_goal_velocity(3, forward_velocity)  # ID 3は速度を反転
 
-            # Check for stop signal in auto mode
-            if current_mode == AUTO_MODE and check_stop_signal():
-                set_goal_velocity(2, 0)
-                set_goal_velocity(3, 0)
-                print("Auto mode stop signal received. Motors stopped.")
+                            if event.type == JOYBUTTONDOWN and event.button == BUTTON_EXIT_PROGRAM:
+                                print("PS button pressed. Exiting program.")
+                                continue_auto_mode = False  # 自動モードを終了
+                                break
+
+                        if auto_mode_active:
+                            # 前進中にGPIO26がHIGHを検出した場合の処理
+                            if check_stop_signal():
+                                print("AUTO MODE: GPIO26 triggered, executing sequence.")
+                                # 停止
+                                set_goal_velocity(2, 0)
+                                set_goal_velocity(3, 0)
+                                time.sleep(STOP_DURATION)
+
+                                # 右旋回
+                                set_goal_velocity(2, turning_velocity)
+                                set_goal_velocity(3, -turning_velocity)
+                                time.sleep(TURN_DURATION)
+
+                                # 前進
+                                set_goal_velocity(2, forward_velocity)
+                                set_goal_velocity(3, forward_velocity)
+                                time.sleep(MOVE_FORWARD_DURATION)
+
+                                # 右旋回
+                                set_goal_velocity(2, turning_velocity)
+                                set_goal_velocity(3, -turning_velocity)
+                                time.sleep(TURN_DURATION)
+
+                                set_goal_velocity(2, 0)
+                                set_goal_velocity(3, 0)
+                                print("AUTO MODE: Sequence complete. Motors stopped.")
+                                auto_mode_active = False  # シーケンス終了後は再び停止状態に戻る
+                                break  # シーケンス後のループを終了
+
 
 finally:
     enable_torque(DXL_IDS, TORQUE_DISABLE)
