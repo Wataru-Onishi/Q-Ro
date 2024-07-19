@@ -35,7 +35,6 @@ HAT_LEFT = (-1, 0)
 STOP_DURATION = 1  # Time to stop in seconds
 TURN_DURATION = 5  # Time to turn right in seconds
 MOVE_FORWARD_DURATION = 3  # Time to move forward in seconds
-SENSOR_SAMPLING_INTERVAL = 0.1  # Time between sensor checks in seconds
 
 # Dynamixel control table addresses
 ADDR_OPERATING_MODE = 11
@@ -152,52 +151,35 @@ try:
                         print(f"Current limit toggled to {current_limit}mA.")
 
             elif event.type == JOYHATMOTION:
-                if current_mode == MANUAL_MODE:
-                    if joystick.get_hat(0) == HAT_UP:
+                if joystick.get_hat(0) == HAT_UP:
+                    if current_mode == MANUAL_MODE:
                         set_operating_mode(2, VELOCITY_CONTROL_MODE)
                         set_operating_mode(3, VELOCITY_CONTROL_MODE)
                         set_goal_velocity(2, forward_velocity)
                         set_goal_velocity(3, forward_velocity)
                         print("Motors 2 and 3 are set to move forward at controlled speed.")
-                    elif joystick.get_hat(0) == HAT_DOWN:
-                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
-                        set_goal_velocity(2, backward_velocity)
-                        set_goal_velocity(3, backward_velocity)
-                        print("Motors 2 and 3 are set to move backward at controlled speed.")
-                    elif joystick.get_hat(0) == HAT_RIGHT:
-                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
+                    elif current_mode == AUTO_MODE:
+                        print("AUTO MODE: Executing predefined sequence.")
+                        # Initiate sequence only if HAT_UP in AUTO MODE
+                        # Stop sequence
+                        set_goal_velocity(2, 0)
+                        set_goal_velocity(3, 0)
+                        time.sleep(STOP_DURATION)
+                        # Turn right sequence
                         set_goal_velocity(2, turning_velocity)
                         set_goal_velocity(3, -turning_velocity)
-                        print("Turning right with Motors 2 and 3.")
-                    elif joystick.get_hat(0) == HAT_LEFT:
-                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
-                        set_goal_velocity(2, -turning_velocity)
-                        set_goal_velocity(3, turning_velocity)
-                        print("Turning left with Motors 2 and 3.")
-                elif current_mode == AUTO_MODE and joystick.get_hat(0) == HAT_UP:
-                    print("AUTO MODE: Executing predefined sequence.")
-                    # Stop sequence
-                    set_goal_velocity(2, 0)
-                    set_goal_velocity(3, 0)
-                    time.sleep(STOP_DURATION)
-                    # Turn right sequence
-                    set_goal_velocity(2, turning_velocity)
-                    set_goal_velocity(3, -turning_velocity)
-                    time.sleep(TURN_DURATION)
-                    # Move forward sequence
-                    set_goal_velocity(2, forward_velocity)
-                    set_goal_velocity(3, forward_velocity)
-                    time.sleep(MOVE_FORWARD_DURATION)
-                    # Final turn right sequence
-                    set_goal_velocity(2, turning_velocity)
-                    set_goal_velocity(3, -turning_velocity)
-                    time.sleep(TURN_DURATION)
-                    set_goal_velocity(2, 0)
-                    set_goal_velocity(3, 0)
-                    print("Sequence complete. Motors stopped.")
+                        time.sleep(TURN_DURATION)
+                        # Move forward sequence
+                        set_goal_velocity(2, forward_velocity)
+                        set_goal_velocity(3, forward_velocity)
+                        time.sleep(MOVE_FORWARD_DURATION)
+                        # Final turn right sequence
+                        set_goal_velocity(2, turning_velocity)
+                        set_goal_velocity(3, -turning_velocity)
+                        time.sleep(TURN_DURATION)
+                        set_goal_velocity(2, 0)
+                        set_goal_velocity(3, 0)
+                        print("Sequence complete. Motors stopped.")
 
 finally:
     enable_torque(DXL_IDS, TORQUE_DISABLE)
