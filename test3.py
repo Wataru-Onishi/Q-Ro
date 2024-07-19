@@ -239,9 +239,9 @@ try:
                                         set_goal_velocity(3, 0)
                                         time.sleep(STOP_DURATION)
 
-                                        # 左旋回
-                                        set_goal_velocity(2, -turning_velocity)
-                                        set_goal_velocity(3, turning_velocity)
+                                        # 右旋回
+                                        set_goal_velocity(2, turning_velocity)
+                                        set_goal_velocity(3, -turning_velocity)
                                         time.sleep(TURN_DURATION)
 
                                         # 前進
@@ -249,9 +249,9 @@ try:
                                         set_goal_velocity(3, forward_velocity)
                                         time.sleep(MOVE_FORWARD_DURATION)
 
-                                        # 右旋回
-                                        set_goal_velocity(2, turning_velocity)
-                                        set_goal_velocity(3, -turning_velocity)
+                                        # 左旋回
+                                        set_goal_velocity(2, -turning_velocity)
+                                        set_goal_velocity(3, turning_velocity)
                                         time.sleep(TURN_DURATION)
 
                                         set_goal_velocity(2, 0)
