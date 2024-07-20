@@ -33,7 +33,7 @@ HAT_LEFT = (-1, 0)
 
 # Timing constants for auto mode operations
 STOP_DURATION = 1  # Time to stop in seconds
-TURN_DURATION = 2.6  # Time to turn right in seconds
+TURN_DURATION = 2.7  # Time to turn right in seconds
 MOVE_FORWARD_DURATION = 2  # Time to move forward in seconds
 SENSOR_SAMPLING_INTERVAL = 0.1  # Time between sensor checks in seconds
 
@@ -67,8 +67,8 @@ current_limit = CURRENT_LIMIT_HIGH
 
 # Position and velocity settings
 standard_position = 2048
-forward_velocity = 300
-backward_velocity = -300
+forward_velocity = 400
+backward_velocity = -400
 turning_velocity = 100
 new_goal_position = 4096
 
