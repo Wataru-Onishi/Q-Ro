@@ -66,7 +66,7 @@ CURRENT_LIMIT_LOW = 4
 current_limit = CURRENT_LIMIT_HIGH
 
 # Position and velocity settings
-standard_position = 1000
+standard_position = 800
 forward_velocity = 300
 backward_velocity = -300
 turning_velocity = 100
