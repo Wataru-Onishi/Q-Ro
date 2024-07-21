@@ -66,11 +66,11 @@ CURRENT_LIMIT_LOW = 4
 current_limit = CURRENT_LIMIT_HIGH
 
 # Position and velocity settings
-standard_position = 1024
+standard_position = 1524
 forward_velocity = 400
 backward_velocity = -400
 turning_velocity = 100
-new_goal_position = 2048
+new_goal_position = 3000
 
 # Mode settings
 MANUAL_MODE = 0
