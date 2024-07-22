@@ -62,12 +62,12 @@ VELOCITY_CONTROL_MODE = 1
 
 # Current limit settings
 CURRENT_LIMIT_HIGH = 12
-CURRENT_LIMIT_LOW = 4
+CURRENT_LIMIT_LOW = 3
 current_limit = CURRENT_LIMIT_HIGH
 
 # Position and velocity settings
 standard_position = 800
-forward_velocity = 300
+forward_velocity = 0
 backward_velocity = -300
 turning_velocity = 100
 new_goal_position = 2300
