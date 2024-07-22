@@ -70,7 +70,7 @@ standard_position = 1800
 forward_velocity = 300
 backward_velocity = -300
 turning_velocity = 100
-new_goal_position =4200
+new_goal_position =200
 
 # Mode settings
 MANUAL_MODE = 0
