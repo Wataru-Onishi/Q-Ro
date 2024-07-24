@@ -213,7 +213,7 @@ try:
                                 # 右旋回
                                 set_goal_velocity(2, turning_velocity)
                                 set_goal_velocity(3, -turning_velocity)
-                                time.sleep(RIGHT_TURN_DURATIONTURN_DURATION)
+                                time.sleep(RIGHT_TURN_DURATION)
 
                                 # 前進
                                 set_goal_velocity(2, forward_velocity)
@@ -223,7 +223,7 @@ try:
                                 # 左旋回
                                 set_goal_velocity(2, -turning_velocity)
                                 set_goal_velocity(3, turning_velocity)
-                                time.sleep(LEFT_TURN_DURATIONTURN_DURATION)
+                                time.sleep(LEFT_TURN_DURATION)
 
                                 # シーケンス完了後、後進を開始
                                 print("Starting backward movement.")
