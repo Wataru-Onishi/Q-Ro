@@ -99,7 +99,9 @@ def set_goal_position(id, position):
     packetHandler.write4ByteTxRx(portHandler, id, ADDR_GOAL_POSITION, position)
 
 def set_goal_velocity(id, velocity):
-    if id == 4:
+    if id == 2:
+        velocity = -velocity  # Reverse velocity for ID 2
+    elif id == 4:
         velocity = -velocity  # Reverse velocity for ID 4
     packetHandler.write4ByteTxRx(portHandler, id, ADDR_GOAL_VELOCITY, velocity)
 
@@ -157,40 +159,40 @@ try:
                         set_operating_mode(3, VELOCITY_CONTROL_MODE)
                         set_operating_mode(4, VELOCITY_CONTROL_MODE)
                         set_goal_velocity(1, forward_velocity)
-                        set_goal_velocity(2, forward_velocity)
+                        set_goal_velocity(2, forward_velocity)  # Reversed for ID 2
                         set_goal_velocity(3, forward_velocity)
                         set_goal_velocity(4, forward_velocity)
-                        print("Motors 1, 2, 3, and 4 are set to move forward at controlled speed.")
+                        print("Motors 1, 2 (reversed), 3, and 4 are set to move forward at controlled speed.")
                     elif joystick.get_hat(0) == HAT_DOWN:
                         set_operating_mode(1, VELOCITY_CONTROL_MODE)
                         set_operating_mode(2, VELOCITY_CONTROL_MODE)
                         set_operating_mode(3, VELOCITY_CONTROL_MODE)
                         set_operating_mode(4, VELOCITY_CONTROL_MODE)
                         set_goal_velocity(1, backward_velocity)
-                        set_goal_velocity(2, backward_velocity)
+                        set_goal_velocity(2, backward_velocity)  # Reversed for ID 2
                         set_goal_velocity(3, backward_velocity)
                         set_goal_velocity(4, backward_velocity)
-                        print("Motors 1, 2, 3, and 4 are set to move backward at controlled speed.")
+                        print("Motors 1, 2 (reversed), 3, and 4 are set to move backward at controlled speed.")
                     elif joystick.get_hat(0) == HAT_RIGHT:
                         set_operating_mode(1, VELOCITY_CONTROL_MODE)
                         set_operating_mode(2, VELOCITY_CONTROL_MODE)
                         set_operating_mode(3, VELOCITY_CONTROL_MODE)
                         set_operating_mode(4, VELOCITY_CONTROL_MODE)
                         set_goal_velocity(1, turning_velocity)
-                        set_goal_velocity(2, turning_velocity)
+                        set_goal_velocity(2, turning_velocity)  # Reversed for ID 2
                         set_goal_velocity(3, -turning_velocity)
                         set_goal_velocity(4, -turning_velocity)
-                        print("Turning right with Motors 1, 2, 3, and 4.")
+                        print("Turning right with Motors 1, 2 (reversed), 3, and 4.")
                     elif joystick.get_hat(0) == HAT_LEFT:
                         set_operating_mode(1, VELOCITY_CONTROL_MODE)
                         set_operating_mode(2, VELOCITY_CONTROL_MODE)
                         set_operating_mode(3, VELOCITY_CONTROL_MODE)
                         set_operating_mode(4, VELOCITY_CONTROL_MODE)
                         set_goal_velocity(1, -turning_velocity)
-                        set_goal_velocity(2, -turning_velocity)
+                        set_goal_velocity(2, -turning_velocity)  # Reversed for ID 2
                         set_goal_velocity(3, turning_velocity)
                         set_goal_velocity(4, turning_velocity)
-                        print("Turning left with Motors 1, 2, 3, and 4.")
+                        print("Turning left with Motors 1, 2 (reversed), 3, and 4.")
 finally:
     enable_torque(DXL_IDS, TORQUE_DISABLE)
     enable_torque([TORQUE_CONTROL_ID], TORQUE_DISABLE)
