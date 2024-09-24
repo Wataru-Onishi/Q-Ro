@@ -72,30 +72,30 @@ current_mode = MANUAL_MODE
 # Define motor direction constants for forward, backward, left, and right turns
 FORWARD_DIRECTION = {
     1: velocity_value,
-    2: velocity_value,
+    2: -velocity_value,
     3: velocity_value,
-    4: velocity_value
+    4: -velocity_value
 }
 
 BACKWARD_DIRECTION = {
     1: -velocity_value,
-    2: -velocity_value,
+    2: velocity_value,
     3: -velocity_value,
-    4: -velocity_value
+    4: velocity_value
 }
 
 RIGHT_TURN_DIRECTION = {
-    1: -velocity_value,  # Reverse for right turn
+    1: velocity_value,  # Reverse for right turn
     2: velocity_value,   # Normal for ID 2
     3: velocity_value,   # Normal for ID 3
-    4: -velocity_value   # Reverse for right turn
+    4: velocity_value   # Reverse for right turn
 }
 
 LEFT_TURN_DIRECTION = {
-    1: velocity_value,   # Normal for ID 1
+    1: -velocity_value,   # Normal for ID 1
     2: -velocity_value,  # Reverse for ID 2
     3: -velocity_value,  # Reverse for ID 3
-    4: velocity_value    # Normal for ID 4
+    4: -velocity_value    # Normal for ID 4
 }
 
 # Initialize PortHandler and PacketHandler instances
