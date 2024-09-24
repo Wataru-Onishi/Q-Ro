@@ -64,6 +64,9 @@ standard_position = 400
 new_goal_position = 2300
 velocity_value = 150  # Base velocity value
 
+# Define turning speeds
+TURNING_SPEED = 100  # Speed for turning movements
+
 # Mode settings
 MANUAL_MODE = 0
 AUTO_MODE = 1
@@ -85,17 +88,17 @@ BACKWARD_DIRECTION = {
 }
 
 RIGHT_TURN_DIRECTION = {
-    1: velocity_value,  # Reverse for right turn
-    2: velocity_value,   # Normal for ID 2
-    3: velocity_value,   # Normal for ID 3
-    4: velocity_value   # Reverse for right turn
+    1: TURNING_SPEED,   # Speed for right turn
+    2: TURNING_SPEED,   # Speed for ID 2
+    3: TURNING_SPEED,   # Speed for ID 3
+    4: TURNING_SPEED    # Speed for right turn
 }
 
 LEFT_TURN_DIRECTION = {
-    1: -velocity_value,   # Normal for ID 1
-    2: -velocity_value,  # Reverse for ID 2
-    3: -velocity_value,  # Reverse for ID 3
-    4: -velocity_value    # Normal for ID 4
+    1: -TURNING_SPEED,  # Speed for left turn
+    2: -TURNING_SPEED,  # Speed for ID 2
+    3: -TURNING_SPEED,  # Speed for ID 3
+    4: -TURNING_SPEED   # Speed for left turn
 }
 
 # Initialize PortHandler and PacketHandler instances
