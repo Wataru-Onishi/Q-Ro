@@ -126,6 +126,12 @@ def move_motors(direction):
     for motor_id, velocity in direction.items():
         set_goal_velocity(motor_id, velocity)
 
+def set_goal_current(id, current):
+    packetHandler.write2ByteTxRx(portHandler, id, ADDR_GOAL_CURRENT, current)
+
+def set_goal_position(id, position):
+    packetHandler.write4ByteTxRx(portHandler, id, ADDR_GOAL_POSITION, position)
+
 # Enable torque for all driving motors (IDs 1-4)
 enable_torque(DXL_IDS, TORQUE_ENABLE)
 
@@ -152,6 +158,20 @@ try:
                 elif event.button == BUTTON_EXIT_PROGRAM:
                     print("PS button pressed. Exiting program.")
                     running = False
+
+                # Restore ID 0 torque control functionality
+                if event.button == BUTTON_MOVE_TO_POSITION_X:
+                    set_operating_mode(TORQUE_CONTROL_ID, CURRENT_BASED_POSITION_CONTROL)
+                    set_goal_current(TORQUE_CONTROL_ID, current_limit)
+                    set_goal_position(TORQUE_CONTROL_ID, new_goal_position)
+                    print(f"ID 0 (Torque control): Moving to position {new_goal_position} with {current_limit}mA.")
+                elif event.button == BUTTON_MOVE_TO_STANDARD_POSITION:
+                    set_operating_mode(TORQUE_CONTROL_ID, POSITION_CONTROL_MODE)
+                    set_goal_position(TORQUE_CONTROL_ID, standard_position)
+                    print(f"ID 0 (Torque control): Moving to standard position {standard_position}.")
+                elif event.button == BUTTON_TOGGLE_CURRENT_LIMIT:
+                    current_limit = CURRENT_LIMIT_LOW if current_limit == CURRENT_LIMIT_HIGH else CURRENT_LIMIT_HIGH
+                    print(f"Current limit toggled to {current_limit}mA.")
 
             elif event.type == JOYHATMOTION:
                 if current_mode == MANUAL_MODE:
