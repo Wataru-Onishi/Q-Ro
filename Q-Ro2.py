@@ -61,15 +61,42 @@ current_limit = CURRENT_LIMIT_HIGH
 
 # Position and velocity settings
 standard_position = 400
-forward_velocity = 150
-backward_velocity = -150
-turning_velocity = 100
 new_goal_position = 2300
+velocity_value = 150  # Base velocity value
 
 # Mode settings
 MANUAL_MODE = 0
 AUTO_MODE = 1
 current_mode = MANUAL_MODE
+
+# Define motor direction constants for forward, backward, left, and right turns
+FORWARD_DIRECTION = {
+    1: velocity_value,
+    2: velocity_value,
+    3: velocity_value,
+    4: velocity_value
+}
+
+BACKWARD_DIRECTION = {
+    1: -velocity_value,
+    2: -velocity_value,
+    3: -velocity_value,
+    4: -velocity_value
+}
+
+RIGHT_TURN_DIRECTION = {
+    1: -velocity_value,  # Reverse for right turn
+    2: velocity_value,   # Normal for ID 2
+    3: velocity_value,   # Normal for ID 3
+    4: -velocity_value   # Reverse for right turn
+}
+
+LEFT_TURN_DIRECTION = {
+    1: velocity_value,   # Normal for ID 1
+    2: -velocity_value,  # Reverse for ID 2
+    3: -velocity_value,  # Reverse for ID 3
+    4: velocity_value    # Normal for ID 4
+}
 
 # Initialize PortHandler and PacketHandler instances
 portHandler = PortHandler(DEVICENAME)
@@ -92,19 +119,12 @@ def set_operating_mode(id, mode):
     packetHandler.write1ByteTxRx(portHandler, id, ADDR_OPERATING_MODE, mode)
     enable_torque([id], TORQUE_ENABLE)
 
-def set_goal_current(id, current):
-    packetHandler.write2ByteTxRx(portHandler, id, ADDR_GOAL_CURRENT, current)
-
-def set_goal_position(id, position):
-    packetHandler.write4ByteTxRx(portHandler, id, ADDR_GOAL_POSITION, position)
-
-def set_goal_velocity(id, velocity, is_turning=False):
-    if id == 2:
-        velocity = -velocity  # Reverse velocity for ID 2
-    elif id == 3 or id == 4:
-        if is_turning:
-            velocity = -velocity  # Reverse velocity for ID 3 and 4 only during turns
+def set_goal_velocity(id, velocity):
     packetHandler.write4ByteTxRx(portHandler, id, ADDR_GOAL_VELOCITY, velocity)
+
+def move_motors(direction):
+    for motor_id, velocity in direction.items():
+        set_goal_velocity(motor_id, velocity)
 
 # Enable torque for all driving motors (IDs 1-4)
 enable_torque(DXL_IDS, TORQUE_ENABLE)
@@ -122,78 +142,31 @@ try:
                 if event.button == BUTTON_TOGGLE_MODE:
                     current_mode = AUTO_MODE if current_mode == MANUAL_MODE else MANUAL_MODE
                     if current_mode == AUTO_MODE:
-                        set_goal_velocity(1, 0)  # Stop all motors when entering auto mode
-                        set_goal_velocity(2, 0)
-                        set_goal_velocity(3, 0)
-                        set_goal_velocity(4, 0)
+                        move_motors({1: 0, 2: 0, 3: 0, 4: 0})  # Stop all motors when entering auto mode
                         print("Switched to AUTO MODE. Motors stopped.")
                     else:
                         print("Switched to MANUAL MODE.")
                 elif event.button == BUTTON_BRAKE_MOTORS:
-                    set_goal_velocity(1, 0)
-                    set_goal_velocity(2, 0)
-                    set_goal_velocity(3, 0)
-                    set_goal_velocity(4, 0)
+                    move_motors({1: 0, 2: 0, 3: 0, 4: 0})
                     print("Braking Motors 1, 2, 3, and 4.")
                 elif event.button == BUTTON_EXIT_PROGRAM:
                     print("PS button pressed. Exiting program.")
                     running = False
-                if current_mode == MANUAL_MODE:
-                    if event.button == BUTTON_MOVE_TO_POSITION_X:
-                        set_operating_mode(TORQUE_CONTROL_ID, CURRENT_BASED_POSITION_CONTROL)
-                        set_goal_current(TORQUE_CONTROL_ID, current_limit)
-                        set_goal_position(TORQUE_CONTROL_ID, new_goal_position)
-                        print(f"ID 0 (Torque control): Moving to position {new_goal_position} with {current_limit}mA.")
-                    elif event.button == BUTTON_MOVE_TO_STANDARD_POSITION:
-                        set_operating_mode(TORQUE_CONTROL_ID, POSITION_CONTROL_MODE)
-                        set_goal_position(TORQUE_CONTROL_ID, standard_position)
-                        print(f"ID 0 (Torque control): Moving to standard position {standard_position}.")
-                    elif event.button == BUTTON_TOGGLE_CURRENT_LIMIT:
-                        current_limit = CURRENT_LIMIT_LOW if current_limit == CURRENT_LIMIT_HIGH else CURRENT_LIMIT_HIGH
-                        print(f"Current limit toggled to {current_limit}mA.")
 
             elif event.type == JOYHATMOTION:
                 if current_mode == MANUAL_MODE:
                     if joystick.get_hat(0) == HAT_UP:
-                        set_operating_mode(1, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(4, VELOCITY_CONTROL_MODE)
-                        set_goal_velocity(1, forward_velocity)
-                        set_goal_velocity(2, forward_velocity)  # Reversed for ID 2
-                        set_goal_velocity(3, forward_velocity)
-                        set_goal_velocity(4, forward_velocity)
-                        print("Motors 1, 2 (reversed), 3, and 4 are set to move forward at controlled speed.")
+                        move_motors(FORWARD_DIRECTION)
+                        print("Motors are set to move forward at controlled speed.")
                     elif joystick.get_hat(0) == HAT_DOWN:
-                        set_operating_mode(1, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(4, VELOCITY_CONTROL_MODE)
-                        set_goal_velocity(1, backward_velocity)
-                        set_goal_velocity(2, backward_velocity)  # Reversed for ID 2
-                        set_goal_velocity(3, backward_velocity)
-                        set_goal_velocity(4, backward_velocity)
-                        print("Motors 1, 2 (reversed), 3, and 4 are set to move backward at controlled speed.")
+                        move_motors(BACKWARD_DIRECTION)
+                        print("Motors are set to move backward at controlled speed.")
                     elif joystick.get_hat(0) == HAT_RIGHT:
-                        set_operating_mode(1, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(4, VELOCITY_CONTROL_MODE)
-                        set_goal_velocity(1, -turning_velocity, is_turning=True)  # Reverse for right turn
-                        set_goal_velocity(2, turning_velocity)   # Normal for ID 2
-                        set_goal_velocity(3, -turning_velocity, is_turning=True)  # Reverse for ID 3
-                        set_goal_velocity(4, -turning_velocity, is_turning=True)  # Reverse for ID 4
-                        print("Turning right with adjusted velocities for Motors 1, 2, 3 (reversed), and 4 (reversed).")
+                        move_motors(RIGHT_TURN_DIRECTION)
+                        print("Turning right with adjusted velocities.")
                     elif joystick.get_hat(0) == HAT_LEFT:
-                        set_operating_mode(1, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(2, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(3, VELOCITY_CONTROL_MODE)
-                        set_operating_mode(4, VELOCITY_CONTROL_MODE)
-                        set_goal_velocity(1, turning_velocity, is_turning=True)   # Normal for ID 1
-                        set_goal_velocity(2, -turning_velocity)  # Reverse for ID 2
-                        set_goal_velocity(3, turning_velocity, is_turning=True)  # Reverse for ID 3
-                        set_goal_velocity(4, turning_velocity, is_turning=True)  # Reverse for ID 4
-                        print("Turning left with adjusted velocities for Motors 1, 2, 3 (reversed), and 4 (reversed).")
+                        move_motors(LEFT_TURN_DIRECTION)
+                        print("Turning left with adjusted velocities.")
 finally:
     enable_torque(DXL_IDS, TORQUE_DISABLE)
     enable_torque([TORQUE_CONTROL_ID], TORQUE_DISABLE)
