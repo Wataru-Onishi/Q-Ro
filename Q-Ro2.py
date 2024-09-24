@@ -98,11 +98,12 @@ def set_goal_current(id, current):
 def set_goal_position(id, position):
     packetHandler.write4ByteTxRx(portHandler, id, ADDR_GOAL_POSITION, position)
 
-def set_goal_velocity(id, velocity):
+def set_goal_velocity(id, velocity, is_turning=False):
     if id == 2:
         velocity = -velocity  # Reverse velocity for ID 2
-    elif id == 4:
-        velocity = -velocity  # Reverse velocity for ID 4 during forward and backward movement
+    elif id == 3 or id == 4:
+        if is_turning:
+            velocity = -velocity  # Reverse velocity for ID 3 and 4 only during turns
     packetHandler.write4ByteTxRx(portHandler, id, ADDR_GOAL_VELOCITY, velocity)
 
 # Enable torque for all driving motors (IDs 1-4)
@@ -178,21 +179,21 @@ try:
                         set_operating_mode(2, VELOCITY_CONTROL_MODE)
                         set_operating_mode(3, VELOCITY_CONTROL_MODE)
                         set_operating_mode(4, VELOCITY_CONTROL_MODE)
-                        set_goal_velocity(1, -turning_velocity)  # Reverse for right turn
+                        set_goal_velocity(1, -turning_velocity, is_turning=True)  # Reverse for right turn
                         set_goal_velocity(2, turning_velocity)   # Normal for ID 2
-                        set_goal_velocity(3, turning_velocity)   # Normal for ID 3
-                        set_goal_velocity(4, -turning_velocity)  # Reverse for right turn
-                        print("Turning right with adjusted velocities for Motors 1, 2, 3, and 4.")
+                        set_goal_velocity(3, -turning_velocity, is_turning=True)  # Reverse for ID 3
+                        set_goal_velocity(4, -turning_velocity, is_turning=True)  # Reverse for ID 4
+                        print("Turning right with adjusted velocities for Motors 1, 2, 3 (reversed), and 4 (reversed).")
                     elif joystick.get_hat(0) == HAT_LEFT:
                         set_operating_mode(1, VELOCITY_CONTROL_MODE)
                         set_operating_mode(2, VELOCITY_CONTROL_MODE)
                         set_operating_mode(3, VELOCITY_CONTROL_MODE)
                         set_operating_mode(4, VELOCITY_CONTROL_MODE)
-                        set_goal_velocity(1, turning_velocity)   # Normal for ID 1
+                        set_goal_velocity(1, turning_velocity, is_turning=True)   # Normal for ID 1
                         set_goal_velocity(2, -turning_velocity)  # Reverse for ID 2
-                        set_goal_velocity(3, -turning_velocity)  # Reverse for ID 3
-                        set_goal_velocity(4, turning_velocity)   # Normal for ID 4
-                        print("Turning left with adjusted velocities for Motors 1, 2, 3, and 4.")
+                        set_goal_velocity(3, turning_velocity, is_turning=True)  # Reverse for ID 3
+                        set_goal_velocity(4, turning_velocity, is_turning=True)  # Reverse for ID 4
+                        print("Turning left with adjusted velocities for Motors 1, 2, 3 (reversed), and 4 (reversed).")
 finally:
     enable_torque(DXL_IDS, TORQUE_DISABLE)
     enable_torque([TORQUE_CONTROL_ID], TORQUE_DISABLE)
