@@ -93,10 +93,10 @@ RIGHT_TURN_DIRECTION = {
 }
 
 LEFT_TURN_DIRECTION = {
-    1: 0*-TURNING_SPEED,  # Speed for left turn
-    2: -TURNING_SPEED,  # Speed for ID 2
-    3: 0*-TURNING_SPEED,  # Speed for ID 3
-    4: -TURNING_SPEED   # Speed for left turn
+    1: -TURNING_SPEED,  # Speed for left turn
+    2: 0*-TURNING_SPEED,  # Speed for ID 2
+    3: -TURNING_SPEED,  # Speed for ID 3
+    4: 0*-TURNING_SPEED   # Speed for left turn
 }
 
 # Initialize PortHandler and PacketHandler instances
