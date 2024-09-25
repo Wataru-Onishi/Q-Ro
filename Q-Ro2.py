@@ -86,16 +86,16 @@ BACKWARD_DIRECTION = {
 }
 
 RIGHT_TURN_DIRECTION = {
-    1: TURNING_SPEED,   # Speed for right turn
+    1: 0*TURNING_SPEED,   # Speed for right turn
     2: TURNING_SPEED,   # Speed for ID 2
-    3: TURNING_SPEED,   # Speed for ID 3
+    3: 0*TURNING_SPEED,   # Speed for ID 3
     4: TURNING_SPEED    # Speed for right turn
 }
 
 LEFT_TURN_DIRECTION = {
-    1: -TURNING_SPEED,  # Speed for left turn
+    1: 0*-TURNING_SPEED,  # Speed for left turn
     2: -TURNING_SPEED,  # Speed for ID 2
-    3: -TURNING_SPEED,  # Speed for ID 3
+    3: 0*-TURNING_SPEED,  # Speed for ID 3
     4: -TURNING_SPEED   # Speed for left turn
 }
 
