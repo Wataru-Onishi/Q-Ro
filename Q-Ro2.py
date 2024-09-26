@@ -62,7 +62,7 @@ current_limit = CURRENT_LIMIT_HIGH
 # Position and velocity settings
 standard_position = 400
 new_goal_position = 2300
-velocity_value = 250  # Base velocity value
+velocity_value = 200  # Base velocity value
 TURNING_SPEED = 150  # Speed for turning movements
 
 # Mode settings
