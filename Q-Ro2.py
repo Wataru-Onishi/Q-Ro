@@ -74,7 +74,7 @@ current_mode = MANUAL_MODE
 FORWARD_DIRECTION = {
     1: velocity_value+5,
     2: -velocity_value,
-    3: velocity_value+5,
+    3: velocity_value,
     4: -velocity_value
 }
 
