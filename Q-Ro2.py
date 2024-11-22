@@ -72,9 +72,9 @@ current_mode = MANUAL_MODE
 
 # Define motor direction constants for forward, backward, left, and right turns
 FORWARD_DIRECTION = {
-    1: velocity_value,
+    1: velocity_value+50,
     2: -velocity_value,
-    3: velocity_value,
+    3: velocity_value+50,
     4: -velocity_value
 }
 
