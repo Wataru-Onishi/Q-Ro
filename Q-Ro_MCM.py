@@ -17,27 +17,31 @@ TORQUE_ENABLE = 1
 TORQUE_DISABLE = 0
 VELOCITY_CONTROL_MODE = 1
 
-# Initialize Dynamixel Port & Packet Handler
+# モーターごとの回転方向定義（1:正転, -1:逆転）
+MOTOR_DIRECTION = {
+    1: 1,    # ID1 → 順方向
+    2: -1,   # ID2 → 逆方向（対向二輪ならここを-1）
+}
+
+# Dynamixel 初期化
 portHandler = PortHandler(DEVICENAME)
 packetHandler = PacketHandler(PROTOCOL_VERSION)
 
-# Open port
 if not portHandler.openPort():
     print("Failed to open port!")
     exit(1)
 
-# Set baudrate
 if not portHandler.setBaudRate(BAUDRATE):
     print("Failed to set baudrate!")
     exit(1)
 
-# Set Operating Mode to Velocity Control & Enable Torque
+# モード設定とトルクON
 for dxl_id in DXL_IDS:
     packetHandler.write1ByteTxRx(portHandler, dxl_id, ADDR_TORQUE_ENABLE, 0)
     packetHandler.write1ByteTxRx(portHandler, dxl_id, ADDR_OPERATING_MODE, VELOCITY_CONTROL_MODE)
     packetHandler.write1ByteTxRx(portHandler, dxl_id, ADDR_TORQUE_ENABLE, TORQUE_ENABLE)
 
-# Initialize pygame joystick
+# Pygameでジョイスティック初期化
 pygame.init()
 pygame.joystick.init()
 
@@ -48,24 +52,37 @@ print(f"Joystick Name: {joystick.get_name()} connected!")
 
 try:
     while True:
-        pygame.event.pump()  # Update joystick states
+        pygame.event.pump()  # ジョイスティック状態更新
 
-        axis_value = joystick.get_axis(1)  # Left stick Y-axis
-        # Y軸は上で-1.0、下で+1.0 → 逆にするなら-をつける
-        velocity = int(axis_value * 500)  # 適当なスケール値
+        # 左スティックY軸（前後）とX軸（旋回）を取得
+        axis_y = joystick.get_axis(1)  # Y軸: -1.0(前) ～ +1.0(後)
+        axis_x = joystick.get_axis(0)  # X軸: -1.0(左) ～ +1.0(右)
 
-        # Dynamixelに速度指令
-        for dxl_id in DXL_IDS:
-            packetHandler.write4ByteTxRx(portHandler, dxl_id, ADDR_GOAL_VELOCITY, abs(velocity))
+        # スケール値（適当な速度倍率）
+        SCALE_Y = 500  # 前後進の速度
+        SCALE_X = 300  # 旋回成分の速度（Yより小さめに調整しても良い）
 
-        print(f"Joystick Y-axis: {axis_value:.2f}, Velocity Command: {velocity}")
+        # 成分計算
+        forward_velocity = int(axis_y * SCALE_Y)
+        turning_velocity = int(axis_x * SCALE_X)
+
+        # ID1/ID2の合成速度計算
+        velocity_id1 = forward_velocity + turning_velocity
+        velocity_id2 = forward_velocity - turning_velocity
+
+        # 各モーターに指令 (MOTOR_DIRECTIONを考慮)
+        packetHandler.write4ByteTxRx(portHandler, 1, ADDR_GOAL_VELOCITY, abs(velocity_id1 * MOTOR_DIRECTION[1]))
+        packetHandler.write4ByteTxRx(portHandler, 2, ADDR_GOAL_VELOCITY, abs(velocity_id2 * MOTOR_DIRECTION[2]))
+
+        print(f"Y: {axis_y:.2f}, X: {axis_x:.2f} | ID1 Velocity: {velocity_id1} | ID2 Velocity: {velocity_id2}")
+
         time.sleep(0.1)
 
 except KeyboardInterrupt:
     print("Exiting...")
 
 finally:
-    # Stop motors and disable torque
+    # モーター停止 & トルクOFF
     for dxl_id in DXL_IDS:
         packetHandler.write4ByteTxRx(portHandler, dxl_id, ADDR_GOAL_VELOCITY, 0)
         packetHandler.write1ByteTxRx(portHandler, dxl_id, ADDR_TORQUE_ENABLE, TORQUE_DISABLE)
