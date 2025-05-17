@@ -3,7 +3,7 @@ import time
 from dynamixel_sdk import *  # Dynamixel SDK
 
 # Dynamixel settings
-DEVICENAME = '/dev/ttyUSB0'
+DEVICENAME = '/dev/dynamixel'
 BAUDRATE = 57600
 PROTOCOL_VERSION = 2.0
 
