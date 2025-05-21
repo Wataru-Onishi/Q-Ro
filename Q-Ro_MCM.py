@@ -59,11 +59,11 @@ try:
         axis_x = joystick.get_axis(0)  # X軸: -1.0(左) ～ +1.0(右)
 
         # スケール値（速度倍率）
-        SCALE_Y = 500  # 前後進の速度
-        SCALE_X = 300  # 旋回成分の速度
+        SCALE_Y = 300  # 前後進の速度
+        SCALE_X = 200  # 旋回成分の速度
 
         # 速度成分計算
-        forward_velocity = int(axis_y * SCALE_Y)
+        forward_velocity = int(-axis_y * SCALE_Y)
         turning_velocity = int(axis_x * SCALE_X)
 
         # 合成速度計算（左右で差をつける）
