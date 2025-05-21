@@ -7,7 +7,7 @@ DEVICENAME = '/dev/dynamixel'
 BAUDRATE = 57600
 PROTOCOL_VERSION = 2.0
 
-DXL_IDS = [1, 2]
+DXL_IDS = [0,1, 2]
 
 ADDR_TORQUE_ENABLE = 64
 ADDR_OPERATING_MODE = 11
@@ -23,6 +23,7 @@ MOTOR_DIRECTION = {
     2: -1,   # ID2 逆転（対向二輪ならここを-1）
 }
 
+
 # Dynamixel 初期化
 portHandler = PortHandler(DEVICENAME)
 packetHandler = PacketHandler(PROTOCOL_VERSION)
@@ -34,6 +35,12 @@ if not portHandler.openPort():
 if not portHandler.setBaudRate(BAUDRATE):
     print("Failed to set baudrate!")
     exit(1)
+
+# ✅ ID0はブレーキ固定用：トルクONのみ
+packetHandler.write1ByteTxRx(portHandler, 0, ADDR_TORQUE_ENABLE, 0)
+packetHandler.write1ByteTxRx(portHandler, 0, ADDR_OPERATING_MODE, VELOCITY_CONTROL_MODE)
+packetHandler.write1ByteTxRx(portHandler, 0, ADDR_TORQUE_ENABLE, TORQUE_ENABLE)
+print("ID0: Torque enabled for brake mode.")
 
 # モード設定とトルクON
 for dxl_id in DXL_IDS:
@@ -59,7 +66,7 @@ try:
         axis_x = joystick.get_axis(0)  # X軸: -1.0(左) ～ +1.0(右)
 
         # スケール値（速度倍率）
-        SCALE_Y = 300  # 前後進の速度
+        SCALE_Y = 200  # 前後進の速度
         SCALE_X = 200  # 旋回成分の速度
 
         # 速度成分計算
