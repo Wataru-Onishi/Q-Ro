@@ -37,9 +37,9 @@ if not portHandler.setBaudRate(BAUDRATE):
     exit(1)
 
 # ✅ ID0はブレーキ固定用：トルクONのみ
-packetHandler.write1ByteTxRx(portHandler, 0, ADDR_TORQUE_ENABLE, 0)
-packetHandler.write1ByteTxRx(portHandler, 0, ADDR_OPERATING_MODE, VELOCITY_CONTROL_MODE)
-packetHandler.write1ByteTxRx(portHandler, 0, ADDR_TORQUE_ENABLE, TORQUE_ENABLE)
+packetHandler.write1ByteTxRx(portHandler, 3, ADDR_TORQUE_ENABLE, 0)
+packetHandler.write1ByteTxRx(portHandler, 3, ADDR_OPERATING_MODE, VELOCITY_CONTROL_MODE)
+packetHandler.write1ByteTxRx(portHandler, 3, ADDR_TORQUE_ENABLE, TORQUE_ENABLE)
 print("ID0: Torque enabled for brake mode.")
 
 # モード設定とトルクON
