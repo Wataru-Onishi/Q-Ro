@@ -90,7 +90,7 @@ try:
                     packetHandler.write1ByteTxRx(portHandler, 3, ADDR_TORQUE_ENABLE, TORQUE_DISABLE)
                     packetHandler.write1ByteTxRx(portHandler, 3, ADDR_OPERATING_MODE, POSITION_CONTROL_MODE)
                     packetHandler.write1ByteTxRx(portHandler, 3, ADDR_TORQUE_ENABLE, TORQUE_ENABLE)
-                    packetHandler.write4ByteTxRx(portHandler, 3, ADDR_GOAL_POSITION, 1200)
+                    packetHandler.write4ByteTxRx(portHandler, 3, ADDR_GOAL_POSITION, 1400)
                     print("ID3: Move to position 1000")
 
                 elif event.button == 1:  # Bボタン
