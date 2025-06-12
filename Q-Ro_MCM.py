@@ -23,7 +23,7 @@ VELOCITY_CONTROL_MODE = 1
 MOTOR_DIRECTION = {
     1: 1,
     2: -1,
-    4: 1,  # ID4も正方向（逆転が必要ならここを -1 に変更）
+    4: -1,  # ID4も正方向（逆転が必要ならここを -1 に変更）
 }
 
 # Dynamixel 初期化
