@@ -1,5 +1,9 @@
 from pmw3901 import PMW3901
 import time
+import math
+
+# ピクセル→mm変換係数（例：0.17mm/pixel）
+PIXEL_TO_MM = 0.17
 
 def main():
     try:
@@ -9,23 +13,30 @@ def main():
         print("センサ初期化に失敗しました:", e)
         return
 
-    total_dx = 0
-    total_dy = 0
+    total_dx_mm = 0.0
+    total_dy_mm = 0.0
     start_time = time.time()
 
     try:
         while True:
             dx, dy = sensor.get_motion()
-            total_dx += dx
-            total_dy += dy
-            #print(f"dx: {dx}, dy: {dy}")
+            dx_mm = dx * PIXEL_TO_MM
+            dy_mm = dy * PIXEL_TO_MM
+
+            total_dx_mm += dx_mm
+            total_dy_mm += dy_mm
+
+            distance = math.sqrt(dx_mm**2 + dy_mm**2)
+
+            #print(f"dx: {dx} ({dx_mm:.2f}mm), dy: {dy} ({dy_mm:.2f}mm), 移動距離: {distance:.2f}mm")
 
             time.sleep(0.01)
 
             if time.time() - start_time >= 1.0:
-                print(f"1秒間の合計移動量 → dx: {total_dx}, dy: {total_dy}")
-                total_dx = 0
-                total_dy = 0
+                total_distance = math.sqrt(total_dx_mm**2 + total_dy_mm**2)
+                print(f"\n[1秒間の合計移動量] dx: {total_dx_mm:.2f}mm, dy: {total_dy_mm:.2f}mm, 距離: {total_distance:.2f}mm\n")
+                total_dx_mm = 0.0
+                total_dy_mm = 0.0
                 start_time = time.time()
 
     except KeyboardInterrupt:
