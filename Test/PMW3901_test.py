@@ -18,7 +18,7 @@ def main():
             dx, dy = sensor.get_motion()
             total_dx += dx
             total_dy += dy
-            print(f"dx: {dx}, dy: {dy}")
+            #print(f"dx: {dx}, dy: {dy}")
 
             time.sleep(0.01)
 
