@@ -2,10 +2,17 @@ from pmw3901 import PMW3901
 import time
 import math
 
-# ピクセル→mm変換係数（例：0.17mm/pixel）
-PIXEL_TO_MM = 0.17
+# =======================================
+# センサ高さをここで指定（単位：mm）
+SENSOR_HEIGHT_MM = 20
+# =======================================
+
+# 高さからピクセル→mm変換係数を推定
+# 目安: 1ピクセル ≒ 0.0017 × 高さ(mm)
+PIXEL_TO_MM = 0.0017 * SENSOR_HEIGHT_MM
 
 def main():
+    print(f"センサ高さ: {SENSOR_HEIGHT_MM}mm, 変換係数: {PIXEL_TO_MM:.4f} mm/pixel")
     try:
         sensor = PMW3901()
         print("PMW3901 初期化完了。動作を開始します。")
@@ -28,7 +35,7 @@ def main():
 
             distance = math.sqrt(dx_mm**2 + dy_mm**2)
 
-            #print(f"dx: {dx} ({dx_mm:.2f}mm), dy: {dy} ({dy_mm:.2f}mm), 移動距離: {distance:.2f}mm")
+            print(f"dx: {dx} ({dx_mm:.2f}mm), dy: {dy} ({dy_mm:.2f}mm), 移動距離: {distance:.2f}mm")
 
             time.sleep(0.01)
 
