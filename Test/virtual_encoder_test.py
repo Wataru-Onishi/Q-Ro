@@ -1,7 +1,7 @@
 import RPi.GPIO as GPIO
 import time
 import math
-# from pmw3901 import PMW3901 # 実際のセンサーを使う場合はコメントアウトを解除
+from pmw3901 import PMW3901 # 実際のセンサーを使う場合はコメントアウトを解除
 import sys
 
 # RPi.GPIOライブラリのインポートを試み、失敗した場合はダミーのモックライブラリを使用する
