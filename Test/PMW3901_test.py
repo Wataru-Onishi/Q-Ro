@@ -5,9 +5,6 @@ def main():
     # センサ初期化（CSピンを変更している場合は spi_cs=〇〇 を指定）
     sensor = PMW3901()
     
-    if not sensor.check_sensor():
-        print("センサの初期化に失敗しました。接続を確認してください。")
-        return
 
     print("PMW3901 初期化完了。動作を開始します。")
     
