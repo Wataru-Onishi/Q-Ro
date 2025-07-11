@@ -5,8 +5,6 @@ import math
 # =======================================
 SENSOR_HEIGHT_MM = 30  # センサの床からの高さ (mm)
 PIXEL_TO_MM = 0.0017 * SENSOR_HEIGHT_MM
-
-PRINT_INTERVAL = 0.2  # 表示間隔（秒）
 # =======================================
 
 def main():
@@ -20,7 +18,6 @@ def main():
 
     total_dx_mm = 0.0
     total_dy_mm = 0.0
-    last_print_time = time.time()
     last_summary_time = time.time()
 
     try:
@@ -34,16 +31,10 @@ def main():
 
             now = time.time()
 
-            # 一定間隔で表示
-            if now - last_print_time >= PRINT_INTERVAL:
-                distance = math.sqrt(dx_mm**2 + dy_mm**2)
-                print(f"dx: {dx} ({dx_mm:.2f}mm), dy: {dy} ({dy_mm:.2f}mm), 距離: {distance:.2f}mm")
-                last_print_time = now
-
-            # 1秒ごとに合計移動量を表示
+            # 1秒ごとに合計移動距離を表示
             if now - last_summary_time >= 1.0:
                 total_distance = math.sqrt(total_dx_mm**2 + total_dy_mm**2)
-                print(f"\n[1秒間の合計] dx: {total_dx_mm:.2f}mm, dy: {total_dy_mm:.2f}mm, 距離: {total_distance:.2f}mm\n")
+                print(f"1秒間の移動距離 → dx: {total_dx_mm:.2f}mm, dy: {total_dy_mm:.2f}mm, 合成距離: {total_distance:.2f}mm")
                 total_dx_mm = 0.0
                 total_dy_mm = 0.0
                 last_summary_time = now
