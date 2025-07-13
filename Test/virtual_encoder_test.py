@@ -33,9 +33,9 @@ except (ModuleNotFoundError, RuntimeError):
 PIN_A = 17
 PIN_B = 27
 PIN_Z = 22
-MM_PER_REV = 15.0
+MM_PER_REV = 150.0
 PULSES_PER_REV = 300
-SENSOR_HEIGHT_MM = 50
+SENSOR_HEIGHT_MM = 10
 PIXEL_TO_MM = 0.0017 * SENSOR_HEIGHT_MM
 
 # ==============================================================================
