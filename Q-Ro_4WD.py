@@ -29,8 +29,8 @@ VELOCITY_CONTROL_MODE = 1
 MOTOR_DIRECTION = {
     1: -1,   # 左前モーター
     2: -1,  # 右前モーター
-    3: 1,   # 左後モーター
-    4: 1,  # 右後モーター
+    3: -1,   # 左後モーター
+    4: -1,  # 右後モーター
 }
 
 # --- 3. DynamixelとPygameの初期化 ---
