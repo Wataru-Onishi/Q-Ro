@@ -29,8 +29,8 @@ VELOCITY_CONTROL_MODE = 1
 MOTOR_DIRECTION = {
     1: -1,   # 左前モーター
     2: -1,  # 右前モーター
-    3: -1,   # 左後モーター
-    4: -1,  # 右後モーター
+    3: 1,   # 左後モーター
+    4: 1,  # 右後モーター
 }
 
 # --- 3. DynamixelとPygameの初期化 ---
@@ -99,12 +99,12 @@ try:
 
         # 各モーターに速度を指令
         # 左側 (ID 1, 3)
-        packetHandler.write4ByteTxRx(portHandler, 1, -ADDR_GOAL_VELOCITY, velocity_left * MOTOR_DIRECTION[1])
+        packetHandler.write4ByteTxRx(portHandler, 1, ADDR_GOAL_VELOCITY, velocity_left * MOTOR_DIRECTION[1])
         packetHandler.write4ByteTxRx(portHandler, 3, ADDR_GOAL_VELOCITY, velocity_left * MOTOR_DIRECTION[3])
 
         # 右側 (ID 2, 4)
         packetHandler.write4ByteTxRx(portHandler, 2, ADDR_GOAL_VELOCITY, velocity_right * MOTOR_DIRECTION[2])
-        packetHandler.write4ByteTxRx(portHandler, 4, -ADDR_GOAL_VELOCITY, velocity_right * MOTOR_DIRECTION[4])
+        packetHandler.write4ByteTxRx(portHandler, 4, ADDR_GOAL_VELOCITY, velocity_right * MOTOR_DIRECTION[4])
 
         # 現在の指令値を表示 (デバッグ用)
         print(f"L:{velocity_left:4d}, R:{velocity_right:4d} | Fwd:{forward_velocity:4d}, Turn:{turning_velocity:4d}", end='\r')
