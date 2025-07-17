@@ -73,6 +73,10 @@ print(f"ジョイスティック '{joystick.get_name()}' が接続されまし�
 # --- 4. メインコントロールループ ---
 try:
     print("\nロボットの操作を開始します。終了するには Ctrl+C を押してください。")
+    # デッドゾーンの閾値 (0.0 から 1.0 の範囲で設定)
+    # この値を大きくすると、スティックを大きく傾けないと反応しなくなります
+    DEADZONE_THRESHOLD = 0.15 # 0.1から少し増やしました。必要に応じて調整してください。
+
     while True:
         # ジョイスティックのイベントを処理
         pygame.event.pump()
@@ -82,9 +86,12 @@ try:
         axis_y = -joystick.get_axis(1)  # 前後
         axis_x = joystick.get_axis(0)   # 旋回
 
-        # スティックの微小な傾き（ドリフト）を無視するデッドゾーン
-        if abs(axis_y) < 0.1: axis_y = 0
-        if abs(axis_x) < 0.1: axis_x = 0
+        # --- デッドゾーンの適用 ---
+        if abs(axis_y) < DEADZONE_THRESHOLD:
+            axis_y = 0
+        if abs(axis_x) < DEADZONE_THRESHOLD:
+            axis_x = 0
+        # ------------------------
 
         # 速度のスケール (この値が大きいほどモーターは速く回転します)
         VELOCITY_SCALE = 200
