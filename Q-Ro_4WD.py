@@ -94,7 +94,7 @@ try:
         # ------------------------
 
         # 速度のスケール (この値が大きいほどモーターは速く回転します)
-        VELOCITY_SCALE = 200
+        VELOCITY_SCALE = 100
 
         # 前後と旋回の基本速度を計算
         forward_velocity = int(axis_y * VELOCITY_SCALE)
