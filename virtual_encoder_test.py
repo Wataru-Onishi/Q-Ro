@@ -35,7 +35,7 @@ PIN_B = 27
 PIN_Z = 22
 MM_PER_REV = 30.0
 PULSES_PER_REV = 250
-SENSOR_HEIGHT_MM = 20
+SENSOR_HEIGHT_MM = 23
 PIXEL_TO_MM = 0.0017 * SENSOR_HEIGHT_MM
 
 # ==============================================================================
